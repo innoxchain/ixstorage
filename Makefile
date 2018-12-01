@@ -12,7 +12,7 @@ OUTPUT := _output
 #LDFLAGS = -X github.com/innoxchain/ixstorage/cmd/ixclient.Version=`git rev-parse --short HEAD` \
 		  -X github.com/innoxchain/ixstorage/cmd/ixclient.BuildTime=`date +%Y-%m-%d`
 
-pkgs = ./pkg/apps/ixclient ./cmd/ixclient
+pkgs = ./build ./cmd/ixclient ./pkg/apps/ixclient
 
 all: build
 
@@ -32,8 +32,7 @@ verify: dependencies lint check_cyclo vet check_deadcode
 .PHONY: lint
 lint: dependencies
 	@echo "Running $@"
-	@${GOLINT_CMD} -min_confidence=1.0 -set_exit_status ./cmd...
-	@${GOLINT_CMD} -min_confidence=1.0 -set_exit_status ./pkg/apps...
+	@${GOLINT_CMD} -min_confidence=1.0 -set_exit_status $(pkgs)
 
 .PHONY: check_cyclo
 check_cyclo: dependencies
