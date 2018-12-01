@@ -1,2 +1,3 @@
+github.com/innoxchain/ixstorage v0.0.1 h1:rHv4JNBGtQ3rvRx+ERrgPSwyj3CW/ZudpKl0oeRTOtw=
 github.com/innoxchain/ixstorage/pkg/apps/ixclient v0.0.1 h1:WUoXNBDE6F9DbQ0+9r1MM3N+Tt5hZga6IZlfUsbF7R0=
 github.com/innoxchain/ixstorage/pkg/apps/ixclient v0.0.1/go.mod h1:TRJnUMJZbhI7g3FSvbddGykOxEe5gGayCuEnIx7IcX4=
