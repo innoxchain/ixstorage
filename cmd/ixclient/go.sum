@@ -1,3 +1,9 @@
 github.com/innoxchain/ixstorage v0.0.1 h1:rHv4JNBGtQ3rvRx+ERrgPSwyj3CW/ZudpKl0oeRTOtw=
+github.com/innoxchain/ixstorage/build v0.0.0-20181201203618-362c8f89e8d4 h1:iVYRiJSK9PK7vquEZAnNWJAaGccV3VG9j1ZCJiC6D3w=
+github.com/innoxchain/ixstorage/build v0.0.0-20181201203618-362c8f89e8d4/go.mod h1:R6bfnBAErkcS61Okgj1GPfDV9IavhtKvzv8wsA7nKwg=
+github.com/innoxchain/ixstorage/build v0.0.1 h1:2IUXKNMO5C6iDA8UbBLGD19ko1MfT4vdOlzgu2ID17o=
+github.com/innoxchain/ixstorage/build v0.0.1/go.mod h1:R6bfnBAErkcS61Okgj1GPfDV9IavhtKvzv8wsA7nKwg=
+github.com/innoxchain/ixstorage/build v0.0.2 h1:1XWeraal+CdKArAccM49ddm9m5IrH8Dp7bQdRdmlchE=
+github.com/innoxchain/ixstorage/build v0.0.2/go.mod h1:R6bfnBAErkcS61Okgj1GPfDV9IavhtKvzv8wsA7nKwg=
 github.com/innoxchain/ixstorage/pkg/apps/ixclient v0.0.1 h1:WUoXNBDE6F9DbQ0+9r1MM3N+Tt5hZga6IZlfUsbF7R0=
 github.com/innoxchain/ixstorage/pkg/apps/ixclient v0.0.1/go.mod h1:TRJnUMJZbhI7g3FSvbddGykOxEe5gGayCuEnIx7IcX4=

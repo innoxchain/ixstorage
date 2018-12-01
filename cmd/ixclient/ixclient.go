@@ -9,5 +9,6 @@ import (
 
 func main() {
 	fmt.Println(ixclient.Greet("world"))
-	fmt.Println("Version: ", version.Version)
+	fmt.Println("Commit: ", build.Commit)
+	fmt.Println("Version: ", build.Version)
 }
