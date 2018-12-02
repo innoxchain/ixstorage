@@ -1,16 +1,23 @@
-BIN_DIR := $(GOPATH)/bin
+GOBIN := $(GOPATH)/bin
 
-GOLINT_CMD := ${BIN_DIR}/golint
-GOCYCLO_CMD := ${BIN_DIR}/gocyclo
-DEADCODE_CMD := ${BIN_DIR}/deadcode
+GOLINT_CMD := ${GOBIN}/golint
+GOCYCLO_CMD := ${GOBIN}/gocyclo
+DEADCODE_CMD := ${GOBIN}/deadcode
 GOLINT := $(shell command -v ${GOLINT_CMD} 2> /dev/null)
 GOCYCLO := $(shell command -v ${GOCYCLO_CMD} 2> /dev/null)
 DEADCODE := $(shell command -v ${DEADCODE_CMD} 2> /dev/null)
 
+GIT_VERSION=$(shell git describe --tags --abbrev=0)
+GIT_COMMIT=$(shell git rev-parse --short HEAD)
+GIT_BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
+GIT_BUILD_TIME=$(shell date +%Y-%m-%d)
+
 OUTPUT := _output
 
-#LDFLAGS = -X github.com/innoxchain/ixstorage/cmd/ixclient.Version=`git rev-parse --short HEAD` \
-		  -X github.com/innoxchain/ixstorage/cmd/ixclient.BuildTime=`date +%Y-%m-%d`
+LDFLAGS = "-X github.com/innoxchain/ixstorage/build.Version=$(GIT_VERSION) \
+-X github.com/innoxchain/ixstorage/build.Commit=$(GIT_COMMIT) \
+-X github.com/innoxchain/ixstorage/build.Branch=$(GIT_BRANCH) \
+-X github.com/innoxchain/ixstorage/build.BuildTime=$(GIT_BUILD_TIME)"
 
 pkgs = ./build ./cmd/ixclient ./pkg/apps/ixclient
 
@@ -56,11 +63,10 @@ test:
 
 build: verify
 	@echo "Building ixclient binary to './_output/ixclient'"
-	@go build -o ${OUTPUT}/ixclient ./cmd/ixclient
-	#@go build -ldflags ${LDFLAGS} -o ${OUTPUT}/ixclient ./cmd/ixclient
+	@go build -ldflags ${LDFLAGS} -o ${OUTPUT}/ixclient ./cmd/ixclient
 
 install: build
-	@echo "Installing ixclient binary to '$(GOPATH)/bin/ixclient'"
+	@echo "Installing ixclient binary to '$(GOPATH)/_output/ixclient'"
 	@mkdir -p $(GOPATH)/bin && cp $(PWD)/_output/ixclient $(GOPATH)/bin/ixclient
 	@echo "Installation successful."
 

@@ -1,6 +1,10 @@
-github.com/innoxchain/ixstorage/build v0.0.2 h1:fO/VX/boNrVUHkXTE25pD8qL0LeoFGmi+I+2Fdy7ZvY=
-github.com/innoxchain/ixstorage/build v0.0.2/go.mod h1:R6bfnBAErkcS61Okgj1GPfDV9IavhtKvzv8wsA7nKwg=
-github.com/innoxchain/ixstorage/cmd/ixclient v0.0.2 h1:AcxC6IYKcWGwcyRAvtCFGyNgf6UVVoxInbUwt7xEvVM=
-github.com/innoxchain/ixstorage/cmd/ixclient v0.0.2/go.mod h1:PeRWxfEoxMPIy3H7FfDdevqNGJJGcCVfc+Zo6vK/GUY=
+github.com/innoxchain/ixstorage/build v0.0.3 h1:jj1iBlQbjMSBcISbOhHHu4RjwdPEAyZO0ODRcQzffdQ=
+github.com/innoxchain/ixstorage/build v0.0.3/go.mod h1:R6bfnBAErkcS61Okgj1GPfDV9IavhtKvzv8wsA7nKwg=
+github.com/innoxchain/ixstorage/cmd/ixclient v0.0.3 h1:XVRJGBd3xqbOA7TOSZ4eg++GB09UMiyVeDmqmazAyTY=
+github.com/innoxchain/ixstorage/cmd/ixclient v0.0.3/go.mod h1:R7z0ge6F128EJ6qMiEX/f2TadRXJR+g6C9rY/mNXNJQ=
 github.com/innoxchain/ixstorage/pkg/apps/ixclient v0.0.1 h1:WUoXNBDE6F9DbQ0+9r1MM3N+Tt5hZga6IZlfUsbF7R0=
 github.com/innoxchain/ixstorage/pkg/apps/ixclient v0.0.1/go.mod h1:TRJnUMJZbhI7g3FSvbddGykOxEe5gGayCuEnIx7IcX4=
+github.com/spf13/cobra v0.0.3 h1:ZlrZ4XsMRm04Fr5pSFxBgfND2EBVa1nLpiy1stUsX/8=
+github.com/spf13/cobra v0.0.3/go.mod h1:1l0Ry5zgKvJasoi3XT1TypsSe7PqH0Sj9dhYf7v3XqQ=
+github.com/spf13/pflag v1.0.3 h1:zPAT6CGy6wXeQ7NtTnaTerfKOsV6V6F8agHXFiazDkg=
+github.com/spf13/pflag v1.0.3/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnInEg4=
