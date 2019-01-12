@@ -1,3 +1,8 @@
+ifndef $(GOPATH)
+    GOPATH=$(shell go env GOPATH)
+    export GOPATH
+endif
+
 GOBIN := $(GOPATH)/bin
 
 GOLINT_CMD := ${GOBIN}/golint

@@ -11,29 +11,36 @@ import (
 
 //Order is the Aggregate which will control the behaviour of state transitions of this Aggregate.
 type Order struct {
-	uuid    string
-	status  event.Status
-	changes []event.DomainEvent
+	UUID    string `json:"uuid"`
+	Version int `json:"version"`
+	Status  enum.OrderStatus `json:"status"`
+	Changes []event.DomainEvent `json:"changes"`
 }
 
 func (o *Order) createOrder(cap enum.Capacity) {
-	o.trackChange(&event.OrderCreatedEvent{AggregateID:uuid.NewV4().String(), CreatedAt: time.Now().String(), Capacity: enum.TenGB})
+	o.Version=0
+	o.trackChange(&event.OrderCreatedEvent{AggregateID:uuid.NewV4().String(), CreatedAt: time.Now().String(), Capacity:cap})
+}
+
+func (o *Order) confirmOrder(issuer string) {
+	o.trackChange(&event.OrderConfirmedEvent{AggregateID: o.UUID, CreatedAt: time.Now().String(), ConfirmedBy: issuer})
 }
 
 func (o *Order) trackChange(event event.DomainEvent) {
-	o.changes = append(o.changes, event)
+	o.Changes = append(o.Changes, event)
 	o.transition(event)
 }
 
 func (o *Order) transition(ev event.DomainEvent) {
 	switch e := ev.(type) {
 	case *event.OrderCreatedEvent:
-		o.uuid = e.GetAggregateID()
-		o.status = event.OrderCreated
+		o.UUID = e.GetAggregateID()
+		o.Status = enum.Created
 	case *event.OrderConfirmedEvent:
-		o.uuid = e.GetAggregateID()
-		o.status = event.OrderConfirmed
+		o.UUID = e.GetAggregateID()
+		o.Status = enum.Confirmed
 	}
+	o.Version++
 }
 
 func GetOrderFromHistory(events []event.DomainEvent) *Order {
@@ -48,7 +55,8 @@ func (o *Order) String() string {
 	format := `Order:
 	uuid: %s
 	status: %s
-	(Pending Changes: %d)`
+	(Pending Changes: %d)
+	(Version: %d)`
 
-	return fmt.Sprintf(format, o.uuid, o.status, len(o.changes))
+	return fmt.Sprintf(format, o.UUID, o.Status, len(o.Changes), o.Version)
 }

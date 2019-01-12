@@ -1,6 +1,7 @@
 package event
 
 import(
+	"encoding/json"
 	"github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum"
 )
 
@@ -21,4 +22,13 @@ func (e *OrderCreatedEvent) GetAggregateID() string {
 
 func (e *OrderCreatedEvent) GetCreatedAt() string {
 	return e.CreatedAt
+}
+
+func (e *OrderCreatedEvent) MarshalJSON() (b []byte, err error) {  
+    return json.Marshal(map[string]string{
+		"AggregateId":  e.GetAggregateID(),
+		"EventType": e.GetType(),
+		"CreatedAt": e.GetCreatedAt(),
+		"Capacity": string(e.Capacity),
+    })
 }
