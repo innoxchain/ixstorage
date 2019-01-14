@@ -12,3 +12,7 @@ const (
 	//TenGB allows 10 GB of capacity
 	TenGB Capacity = iota
 )
+
+func (c Capacity) String() string {
+	return [...]string{"ThreeGB", "SixGB", "TenGB"}[c]
+}

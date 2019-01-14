@@ -29,6 +29,5 @@ func (e *OrderCreatedEvent) MarshalJSON() (b []byte, err error) {
 		"AggregateId":  e.GetAggregateID(),
 		"EventType": e.GetType(),
 		"CreatedAt": e.GetCreatedAt(),
-		"Capacity": string(e.Capacity),
     })
 }

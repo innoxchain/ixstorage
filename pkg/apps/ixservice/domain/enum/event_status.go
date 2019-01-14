@@ -9,3 +9,7 @@ const (
 	//Confirmed is set when an existing order has been confirmed
 	Confirmed OrderStatus = iota
 )
+
+func (os OrderStatus) String() string {
+	return [...]string{"Created", "Confirmed"}[os]
+}
