@@ -28,21 +28,6 @@ func main() {
 	GetOrderFromHistory(eventHistory, newOrder)
 
 	log.Info("Order Aggregate from eventhistory: ", newOrder)
-
-	/*
-			byteSlice, _ := json.Marshal(order)
-		    log.Info(string(byteSlice))
-
-		    newOrder := &Order{}
-		    err := json.Unmarshal(byteSlice, &newOrder)
-		    if err != nil {
-		        log.Fatal(err)
-			}
-
-			for _, event := range newOrder.Changes {
-		        log.Info("event: ", event)
-			}
-	*/
 }
 
 func recreateFromSnapshot(order *Order) []event.DomainEvent {
@@ -60,22 +45,20 @@ func recreateFromSnapshot(order *Order) []event.DomainEvent {
 
 	log.Info("Deserialized Order: ", deserializedOrder)
 
-	order.Status = deserializedOrder.Status
-	order.Version = deserializedOrder.Version
-	order.Changes = deserializedOrder.Changes
+	//Todo: order attributes must not be overridden when events have not yet been
+	//stored in database
 
-	events := db.GetEventsForAggregate(deserializedOrder.UUID, deserializedOrder.Version)
+	events := make([]event.DomainEvent, 0)
 
-	log.Info("deserializedOrder: ", deserializedOrder.UUID)
-	log.Info("order: ", order.UUID)
+	if(EventsPublished(order)) {
+		order.Status = deserializedOrder.Status
+		order.Version = deserializedOrder.Version
+		order.Changes = deserializedOrder.Changes
+		
+		events = db.GetEventsForAggregate(deserializedOrder.UUID, deserializedOrder.Version)
+	}
 
 	return events
-
-	/*
-			for _, event := range deserializedOrder.Changes {
-		        log.Info("event: ", event)
-			}
-	*/
 }
 
 func createOrderWithSnapshot(capacity enum.Capacity, official string) *Order {
@@ -91,10 +74,6 @@ func createOrderWithSnapshot(capacity enum.Capacity, official string) *Order {
 
 	MarkOrderAsCommitted(order)
 
-	//so, err := json.Marshal(order)
-	//if(err!=nil) {
-	//	log.Fatal("Error serializing aggregate: ", err)
-	//}
 	db.CreateSnapshot(order.UUID, string(marshalToJSON(order)), order.Version)
 
 	event = order.confirmOrder(official)

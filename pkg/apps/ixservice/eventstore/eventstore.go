@@ -110,14 +110,10 @@ func (es EventStore) GetSnapshot(aggregateid string) string {
 }
 
 func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []event.DomainEvent {
-	log.Info("======== aggregateid: ", aggregateid)
-	log.Info("======== eventSeq: ", eventSeq)
 
 	events := []event.DomainEvent{}
 
 	rows, err := db.Query("SELECT event_seq, aggregateid, eventtype, eventdata, creationtime FROM events where aggregateid=$1 and event_seq>$2", aggregateid, eventSeq)
-
-	//log.Info("======== GetEventsForAggregate rows: ", rows.Next())
 
 	if err != nil {
 		log.Fatal(err)
@@ -132,26 +128,21 @@ func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []e
 
 		switch eventtype {
 			case "order.created":
-				log.Info("======== eventtype=order.created")
 				deserializedEvent := &event.OrderCreatedEvent{}
 				err := json.Unmarshal([]byte(eventdata), deserializedEvent)
 				if(err!=nil) {
 					log.Fatal("Error deserializing event! ", err)
 				}
-				log.Info("======== Capacity: ", deserializedEvent.Capacity)
 				events = append(events, &event.OrderCreatedEvent{AggregateID: aggregateid, CreatedAt: creationtime, Capacity: deserializedEvent.Capacity})
 			case "order.confirmed":
-				log.Info("======== eventtype=order.confirmed")
 				deserializedEvent := &event.OrderConfirmedEvent{}
 				err := json.Unmarshal([]byte(eventdata), deserializedEvent)
 				if(err!=nil) {
 					log.Fatal("Error deserializing event! ", err)
 				}
-				log.Info("======== ConfirmedBy: ", deserializedEvent.ConfirmedBy)
 				events = append(events, &event.OrderConfirmedEvent{AggregateID: aggregateid, CreatedAt: creationtime, ConfirmedBy: deserializedEvent.ConfirmedBy})
 		}
 	}
-	log.Info("events from eventstore.GetEventsForAggregate: ", events)
 	return events
 }
 

@@ -68,6 +68,10 @@ func MarkOrderAsCommitted(o *Order) {
 	o.Changes = make([]event.DomainEvent, 0)
 }
 
+func EventsPublished(o *Order) bool {
+	return len(o.Changes)==0
+}
+
 func (o *Order) String() string {
 	format := `Order:
 	uuid: %s
@@ -88,20 +92,20 @@ func (o *Order) UnmarshalJSON(b []byte) error {
 
 	log.Info("objMap: ", objMap)
 
-	var rawOrderMessages []*json.RawMessage
-	err = json.Unmarshal(*objMap["changes"], &rawOrderMessages)
+	var rawEventMessages []*json.RawMessage
+	err = json.Unmarshal(*objMap["changes"], &rawEventMessages)
 	if err != nil {
 		return err
 	}
 
-	log.Info("raw message: ", rawOrderMessages)
+	log.Info("raw message: ", rawEventMessages)
 
 	o.UUID, _ = strconv.Unquote(string(*objMap["uuid"]))
 	o.Version, _ = strconv.Atoi(string(*objMap["version"]))
-	o.Changes = make([]event.DomainEvent, len(rawOrderMessages))
+	o.Changes = make([]event.DomainEvent, len(rawEventMessages))
 
 	var m map[string]string
-	for i, rawMessage := range rawOrderMessages {
+	for i, rawMessage := range rawEventMessages {
 		err = json.Unmarshal(*rawMessage, &m)
 		if err != nil {
 			return err
