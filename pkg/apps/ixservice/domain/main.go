@@ -70,14 +70,14 @@ func createOrderWithSnapshot(capacity enum.Capacity, official string) *Order {
 	event := order.createOrder(capacity)
 	log.Info("serialized event: ", event)
 
-	db.CreateEvent(1, order.UUID, "order.created", "order", marshalToJSON(event), time.Now())
+	db.CreateEvent(1, order.UUID, "OrderCreated", "order", marshalToJSON(event), time.Now())
 
 	MarkOrderAsCommitted(order)
 
 	db.CreateSnapshot(order.UUID, string(marshalToJSON(order)), order.Version)
 
 	event = order.confirmOrder(official)
-	db.CreateEvent(2, order.UUID, "order.confirmed", "order", marshalToJSON(event), time.Now())
+	db.CreateEvent(2, order.UUID, "OrderConfirmed", "order", marshalToJSON(event), time.Now())
 
 	MarkOrderAsCommitted(order)
 
@@ -92,11 +92,11 @@ func fulfillOrder(capacity enum.Capacity, official string) *Order {
 
 	event := order.createOrder(capacity)
 
-	db.CreateEvent(1, order.UUID, "order.created", "order", marshalToJSON(event), time.Now())
+	db.CreateEvent(1, order.UUID, "OrderCreated", "order", marshalToJSON(event), time.Now())
 
 	event = order.confirmOrder(official)
 
-	db.CreateEvent(2, order.UUID, "order.confirmed", "order", marshalToJSON(event), time.Now())
+	db.CreateEvent(2, order.UUID, "OrderConfirmed", "order", marshalToJSON(event), time.Now())
 
 	MarkOrderAsCommitted(order)
 

@@ -24,7 +24,8 @@ type Order struct {
 func (o *Order) createOrder(cap enum.Capacity) event.DomainEvent {
 	//Todo: store new event in database from a new service
 	o.Version = 0
-	event := &event.OrderCreatedEvent{AggregateID: uuid.NewV4().String(), CreatedAt: time.Now().String(), Capacity: cap}
+
+	event := &event.OrderCreatedEvent{Event: event.Event{AggregateID: uuid.NewV4().String(), EventType: "OrderCreated" ,CreatedAt: time.Now().String()}, Capacity: cap}
 	o.trackChange(event)
 
 	return event
@@ -32,7 +33,7 @@ func (o *Order) createOrder(cap enum.Capacity) event.DomainEvent {
 
 func (o *Order) confirmOrder(issuer string) event.DomainEvent {
 	//Todo: store new event in database from a new service
-	event := &event.OrderConfirmedEvent{AggregateID: o.UUID, CreatedAt: time.Now().String(), ConfirmedBy: issuer}
+	event := &event.OrderConfirmedEvent{Event: event.Event{AggregateID: o.UUID, EventType: "OrderConfirmed", CreatedAt: time.Now().String()}, ConfirmedBy: issuer}
 	o.trackChange(event)
 
 	return event
@@ -112,14 +113,14 @@ func (o *Order) UnmarshalJSON(b []byte) error {
 		}
 		log.Info("deserialized raw message: ", m)
 
-		if m["EventType"] == "order.created" {
+		if m["EventType"] == "OrderCreated" {
 			var e event.OrderCreatedEvent
 			err := json.Unmarshal(*rawMessage, &e)
 			if err != nil {
 				log.Fatal(err)
 			}
 			o.Changes[i] = &e
-		} else if m["EventType"] == "order.confirmed" {
+		} else if m["EventType"] == "OrderConfirmed" {
 			var e event.OrderConfirmedEvent
 			err := json.Unmarshal(*rawMessage, &e)
 			if err != nil {

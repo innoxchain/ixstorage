@@ -126,6 +126,10 @@ func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []e
 			log.Fatal(err)
 		}
 
+		ev := eventtype + "Event"
+		log.Info("eventsore -> eventtype: ", ev)
+
+
 		switch eventtype {
 			case "order.created":
 				deserializedEvent := &event.OrderCreatedEvent{}
@@ -133,14 +137,23 @@ func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []e
 				if(err!=nil) {
 					log.Fatal("Error deserializing event! ", err)
 				}
-				events = append(events, &event.OrderCreatedEvent{AggregateID: aggregateid, CreatedAt: creationtime, Capacity: deserializedEvent.Capacity})
+				
+				events = append(events, 
+					&event.OrderCreatedEvent{
+						Event: event.Event{AggregateID: aggregateid, EventType: eventtype, CreatedAt: creationtime}, 
+						Capacity: deserializedEvent.Capacity})
+
 			case "order.confirmed":
 				deserializedEvent := &event.OrderConfirmedEvent{}
 				err := json.Unmarshal([]byte(eventdata), deserializedEvent)
 				if(err!=nil) {
 					log.Fatal("Error deserializing event! ", err)
 				}
-				events = append(events, &event.OrderConfirmedEvent{AggregateID: aggregateid, CreatedAt: creationtime, ConfirmedBy: deserializedEvent.ConfirmedBy})
+
+				events = append(events, 
+					&event.OrderConfirmedEvent{
+						Event: event.Event{AggregateID: aggregateid, EventType: eventtype, CreatedAt: creationtime}, 
+						ConfirmedBy: deserializedEvent.ConfirmedBy})
 		}
 	}
 	return events

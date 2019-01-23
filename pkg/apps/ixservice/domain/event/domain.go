@@ -1,31 +1,54 @@
 package event
 
+import (
+	"reflect"
+	"encoding/json"
+)
+
+var eventRegistry = make(map[string]reflect.Type)
+
+type DomainEvent interface {
+	GetEventType() string
+	GetAggregateID() string
+	GetCreatedAt() string
+}
+
 type Event struct {
-	aggregateID string
-	eventType	string
-	createdAt   string
+	AggregateID string
+	EventType	string
+	CreatedAt   string
 }
 
 func (e *Event) GetAggregateID() string {
-	return e.aggregateID
+	return e.AggregateID
 }
 
 func (e *Event) GetEventType() string {
-	return e.eventType
+	return e.EventType
 }
 
 func (e *Event) GetCreatedAt() string {
-	return e.createdAt
+	return e.CreatedAt
 }
 
-func (e *Event) SetEventType(eventType string) {
-	e.eventType = eventType
+func registerEvent(event interface{}) {
+    t := reflect.TypeOf(event).Elem()
+    eventRegistry[t.Name()] = t
 }
 
-func (e *Event) SetAggregateID(aggregateID string) {
-	e.aggregateID = aggregateID
+func getEvent(key string) reflect.Type {
+	return eventRegistry[key]
 }
 
-func (e *Event) SetCreatedAt(createdAt string) {
-	e.createdAt = createdAt
+func makeInstance(name string) interface{} {
+    return reflect.New(eventRegistry[name]).Elem().Interface()
+}
+
+func (e *Event) MarshalJSON() (b []byte, err error) {
+
+    return json.Marshal(map[string]string{
+		"AggregateId":  e.GetAggregateID(),
+		"EventType": e.GetEventType(),
+		"CreatedAt": e.GetCreatedAt(),
+    })
 }

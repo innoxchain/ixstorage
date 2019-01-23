@@ -9,12 +9,10 @@ replace github.com/innoxchain/ixstorage/pkg/apps/ixservice/eventstore v0.0.0 => 
 replace github.com/innoxchain/ixstorage/config v0.0.0 => ../../../../config
 
 require (
-	github.com/innoxchain/ixstorage/config v0.0.0
 	github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum v0.0.0
 	github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/event v0.0.0
 	github.com/innoxchain/ixstorage/pkg/apps/ixservice/eventstore v0.0.0
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/kr/pty v1.1.3 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.3.0
 	golang.org/x/sys v0.0.0-20190109145017-48ac38b7c8cb // indirect
