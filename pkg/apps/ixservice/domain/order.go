@@ -25,7 +25,7 @@ func (o *Order) createOrder(cap enum.Capacity) event.DomainEvent {
 	//Todo: store new event in database from a new service
 	o.Version = 0
 
-	event := &event.OrderCreatedEvent{Event: event.Event{AggregateID: uuid.NewV4().String(), EventType: "OrderCreated" ,CreatedAt: time.Now().String()}, Capacity: cap}
+	event := &event.OrderCreatedEvent{Event: event.Event{AggregateID: uuid.NewV4().String(), EventType: "OrderCreated", CreatedAt: time.Now().String()}, Capacity: cap}
 	o.trackChange(event)
 
 	return event
@@ -47,10 +47,10 @@ func (o *Order) trackChange(event event.DomainEvent) {
 func (o *Order) transition(ev event.DomainEvent) {
 	switch e := ev.(type) {
 	case *event.OrderCreatedEvent:
-		o.UUID = e.GetAggregateID()
+		o.UUID = e.AggregateID
 		o.Status = enum.Created
 	case *event.OrderConfirmedEvent:
-		o.UUID = e.GetAggregateID()
+		o.UUID = e.AggregateID
 		o.Status = enum.Confirmed
 	}
 	o.Version++
@@ -70,7 +70,7 @@ func MarkOrderAsCommitted(o *Order) {
 }
 
 func EventsPublished(o *Order) bool {
-	return len(o.Changes)==0
+	return len(o.Changes) == 0
 }
 
 func (o *Order) String() string {

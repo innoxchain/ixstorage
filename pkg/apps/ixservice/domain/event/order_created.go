@@ -1,6 +1,6 @@
 package event
 
-import(
+import (
 	"github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum"
 )
 

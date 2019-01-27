@@ -113,7 +113,7 @@ func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []e
 
 	events := []event.DomainEvent{}
 
-	rows, err := db.Query("SELECT event_seq, aggregateid, eventtype, eventdata, creationtime FROM events where aggregateid=$1 and event_seq>$2", aggregateid, eventSeq)
+	rows, err := db.Query("SELECT event_seq, aggregateid, aggregatetype, eventtype, eventdata, creationtime FROM events where aggregateid=$1 and event_seq>$2", aggregateid, eventSeq)
 
 	if err != nil {
 		log.Fatal(err)
@@ -121,17 +121,29 @@ func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []e
 	defer rows.Close()
 
 	for rows.Next() {
-		var event_seq, aggregateid, eventtype, eventdata, creationtime string
-		if err := rows.Scan(&event_seq, &aggregateid, &eventtype, &eventdata, &creationtime); err != nil {
+		var event_seq, aggregateid, aggregatetype, eventtype, eventdata, creationtime string
+		if err := rows.Scan(&event_seq, &aggregateid, &aggregatetype, &eventtype, &eventdata, &creationtime); err != nil {
 			log.Fatal(err)
 		}
 
-		ev := eventtype + "Event"
-		log.Info("eventsore -> eventtype: ", ev)
+		/*
+		pe := event.PersistentEvent{
+			AggregateID: aggregateid,
+			AggregateType: aggregatetype,
+			EventType: eventtype,
+			CreatedAt: creationtime,
+			RawData: eventdata,
+		}
 
+		e, err := pe.Deserialize()
+		if err!=nil {
+			log.Fatal("couldn't deserialize PersistentEvent: ", pe)
+		}
+		evs = append(evs, e)
+		*/
 
 		switch eventtype {
-			case "order.created":
+			case "OrderCreated":
 				deserializedEvent := &event.OrderCreatedEvent{}
 				err := json.Unmarshal([]byte(eventdata), deserializedEvent)
 				if(err!=nil) {
@@ -143,7 +155,7 @@ func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []e
 						Event: event.Event{AggregateID: aggregateid, EventType: eventtype, CreatedAt: creationtime}, 
 						Capacity: deserializedEvent.Capacity})
 
-			case "order.confirmed":
+			case "OrderConfirmed":
 				deserializedEvent := &event.OrderConfirmedEvent{}
 				err := json.Unmarshal([]byte(eventdata), deserializedEvent)
 				if(err!=nil) {

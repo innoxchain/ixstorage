@@ -50,11 +50,11 @@ func recreateFromSnapshot(order *Order) []event.DomainEvent {
 
 	events := make([]event.DomainEvent, 0)
 
-	if(EventsPublished(order)) {
+	if EventsPublished(order) {
 		order.Status = deserializedOrder.Status
 		order.Version = deserializedOrder.Version
 		order.Changes = deserializedOrder.Changes
-		
+
 		events = db.GetEventsForAggregate(deserializedOrder.UUID, deserializedOrder.Version)
 	}
 
