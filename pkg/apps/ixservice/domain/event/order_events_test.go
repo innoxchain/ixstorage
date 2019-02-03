@@ -1,28 +1,29 @@
 package event
 
 import (
+	"time"
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"fmt"
-	"time"
 	"github.com/satori/go.uuid"
 )
 
 
 func TestDeserializeOrderRevisedEvent(t *testing.T) {
-	orderRevisedEvent := &OrderRevisedEvent{
+	orderRevisedPayload := &OrderRevised {
 		RevisedBy: "me",
 		Reason:    "not enough money",
 	}
 
-	registerEvent(orderRevisedEvent)
+	RegisterEvent(orderRevisedPayload)
 
 	pe := PersistentEvent{
 		AggregateID:   uuid.NewV4().String(),
-		AggregateType: "order",
-		EventType:     "OrderRevisedEvent",
-		CreatedAt:     time.Now().String(),
+		AggregateType: orderRevisedPayload.GetAggregateType(),
+		EventType:     orderRevisedPayload.GetEventType(),
+		Sequence:	   orderRevisedPayload.GetSequence(),
+		CreatedAt:     time.Now(),
 		RawData:       "{\"RevisedBy\":\"me\",\"Reason\":\"not enough money\"}",
 	}
 
@@ -44,17 +45,18 @@ func TestDeserializeOrderRevisedEvent(t *testing.T) {
 
 func TestSerializeOrderRevisedEvent(t *testing.T) {
 
-	orderRevisedEvent := OrderRevisedEvent{
+	orderRevisedPayload := OrderRevised {
 		RevisedBy: "me",
 		Reason:    "not enough money",
 	}
 
 	event := Event{
 		AggregateID:   uuid.NewV4().String(),
-		AggregateType: "order",
-		EventType:     "OrderRevisedEvent",
-		CreatedAt:     time.Now().String(),
-		Payload:	   orderRevisedEvent,
+		AggregateType: orderRevisedPayload.GetAggregateType(),
+		EventType:     orderRevisedPayload.GetEventType(),
+		Sequence:	   orderRevisedPayload.GetSequence(),
+		CreatedAt:     time.Now(),
+		Payload:	   orderRevisedPayload,
 	}
 
 	persistentEvent, err := event.Serialize()

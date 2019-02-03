@@ -1,8 +1,10 @@
 package event
 
 import (
+	"time"
 	"encoding/json"
 	"reflect"
+	log "github.com/sirupsen/logrus"
 )
 
 var eventRegistry = make(map[string]reflect.Type)
@@ -10,14 +12,16 @@ var eventRegistry = make(map[string]reflect.Type)
 type DomainEvent interface {
 	GetEventType() string
 	GetAggregateType() string
-	GetCreatedAt() string
+	//GetCreatedAt() string
+	GetSequence() int
 }
 
 type Event struct {
 	AggregateID   string
 	AggregateType string
 	EventType     string
-	CreatedAt     string
+	CreatedAt     time.Time
+	Sequence	  int
 	Payload       interface{}
 }
 
@@ -25,7 +29,8 @@ type PersistentEvent struct {
 	AggregateID   string
 	AggregateType string
 	EventType     string
-	CreatedAt     string
+	CreatedAt     time.Time
+	Sequence	  int
 	RawData       string
 }
 
@@ -37,11 +42,19 @@ func (e *Event) GetEventType() string {
 	return e.EventType
 }
 
+func (e *Event) GetSequence() int {
+	return e.Sequence
+}
+
+/*
 func (e *Event) GetCreatedAt() string {
 	return e.CreatedAt
 }
+*/
 
-func registerEvent(event interface{}) {
+func RegisterEvent(event interface{}) {
+	log.Info("RegisterEvent: ", event)
+
 	t := reflect.TypeOf(event).Elem()
 	eventRegistry[t.Name()] = t
 }
@@ -59,8 +72,21 @@ func (e *Event) MarshalJSON() (b []byte, err error) {
 	return json.Marshal(map[string]string{
 		"AggregateType": e.GetAggregateType(),
 		"EventType":     e.GetEventType(),
-		"CreatedAt":     e.GetCreatedAt(),
+		//"CreatedAt":     e.GetCreatedAt(),
 	})
+}
+
+func BuildEvent(de DomainEvent, aggregateID string) Event {
+	event := Event{}
+
+	event.AggregateID=aggregateID
+	event.AggregateType=de.GetAggregateType()
+	event.EventType=de.GetEventType()
+	event.Sequence=de.GetSequence()
+	event.CreatedAt=time.Now()
+	event.Payload=de
+
+	return event
 }
 
 func (e Event) Serialize() (PersistentEvent, error) {
@@ -71,6 +97,7 @@ func (e Event) Serialize() (PersistentEvent, error) {
 	result.AggregateType = e.AggregateType
 	result.CreatedAt = e.CreatedAt
 	result.EventType = e.EventType
+	result.Sequence = e.Sequence
 	
 	ser, err := json.Marshal(e.Payload)
 	if err != nil {
@@ -87,6 +114,7 @@ func (e PersistentEvent) Deserialize() (Event, error) {
 	result := Event{}
 
 	eventType := e.EventType
+
 	dataPointer := reflect.New(eventRegistry[eventType])
 	dataValue := dataPointer.Elem()
 	iface := dataValue.Interface()
@@ -100,6 +128,7 @@ func (e PersistentEvent) Deserialize() (Event, error) {
 	result.AggregateType = e.AggregateType
 	result.EventType = e.EventType
 	result.CreatedAt = e.CreatedAt
+	result.Sequence = e.Sequence
 	result.Payload = iface
 
 	return result, nil

@@ -1,6 +1,7 @@
 package eventstore
 
 import (
+	"strconv"
 	"encoding/json"
 	"time"
 	"database/sql"
@@ -63,12 +64,33 @@ func createTables() {
 			}
 }
 
+//CreateEvent is deprecated
 func (es EventStore) CreateEvent(event_seq int, aggregateid, eventtype, aggregatetype, data string, creationtime time.Time) error {
 	sql := `
 		INSERT INTO events (event_seq, aggregateid, eventtype, aggregatetype, eventdata, creationtime) 
 		VALUES ($1, $2, $3, $4, $5, $6)`
 	
 		_, err := db.Exec(sql, event_seq, aggregateid, eventtype, aggregatetype, data, creationtime)
+
+		if(err!=nil) {
+			return errors.Wrap(err, "error occured when inserting event")
+		}
+	return nil
+}
+
+//PersistEvent persists an Event in the event store
+func (es EventStore) PersistEvent(e event.Event) error {
+	sql := `
+		INSERT INTO events (event_seq, aggregateid, eventtype, aggregatetype, eventdata, creationtime) 
+		VALUES ($1, $2, $3, $4, $5, $6)`
+	
+		persistentEvent, error := e.Serialize()
+
+		if error != nil {
+			log.Fatal(error)
+		}
+
+		_, err := db.Exec(sql, persistentEvent.Sequence, persistentEvent.AggregateID, persistentEvent.EventType, persistentEvent.AggregateType, persistentEvent.RawData, persistentEvent.CreatedAt)
 
 		if(err!=nil) {
 			return errors.Wrap(err, "error occured when inserting event")
@@ -121,26 +143,11 @@ func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []e
 	defer rows.Close()
 
 	for rows.Next() {
-		var event_seq, aggregateid, aggregatetype, eventtype, eventdata, creationtime string
+		var event_seq, aggregateid, aggregatetype, eventtype, eventdata string
+		var creationtime time.Time
 		if err := rows.Scan(&event_seq, &aggregateid, &aggregatetype, &eventtype, &eventdata, &creationtime); err != nil {
 			log.Fatal(err)
 		}
-
-		/*
-		pe := event.PersistentEvent{
-			AggregateID: aggregateid,
-			AggregateType: aggregatetype,
-			EventType: eventtype,
-			CreatedAt: creationtime,
-			RawData: eventdata,
-		}
-
-		e, err := pe.Deserialize()
-		if err!=nil {
-			log.Fatal("couldn't deserialize PersistentEvent: ", pe)
-		}
-		evs = append(evs, e)
-		*/
 
 		switch eventtype {
 			case "OrderCreated":
@@ -167,6 +174,45 @@ func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []e
 						Event: event.Event{AggregateID: aggregateid, EventType: eventtype, CreatedAt: creationtime}, 
 						ConfirmedBy: deserializedEvent.ConfirmedBy})
 		}
+	}
+	return events
+}
+
+func (es EventStore) EventsForAggregate(aggregateid string, eventSeq int) []event.Event {
+
+	events := []event.Event{}
+
+	rows, err := db.Query("SELECT event_seq, aggregateid, aggregatetype, eventtype, eventdata, creationtime FROM events where aggregateid=$1 and event_seq>$2", aggregateid, eventSeq)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var event_seq, aggregateid, aggregatetype, eventtype, eventdata string
+		var creationtime time.Time
+		if err := rows.Scan(&event_seq, &aggregateid, &aggregatetype, &eventtype, &eventdata, &creationtime); err != nil {
+			log.Fatal(err)
+		}
+
+		seq, _ := strconv.Atoi(event_seq)
+
+		pe := event.PersistentEvent{
+			AggregateID: 	aggregateid,
+			AggregateType: 	aggregatetype,
+			EventType: 		eventtype,
+			CreatedAt: 		creationtime,
+			Sequence:		seq,
+			RawData: 		eventdata,
+		}
+
+		e, err := pe.Deserialize()
+		if err!=nil {
+			log.Fatal("couldn't deserialize PersistentEvent: ", pe)
+		}
+
+		events = append(events, e)
 	}
 	return events
 }
