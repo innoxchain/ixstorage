@@ -32,29 +32,30 @@ func TestGetEventForSnapshot(t *testing.T) {
 
 	db := EventStore{}
 
-	orderCreatedPayload := &event.OrderCreated {
+	orderCreated := &event.OrderCreated {
+		UUID: uuid.NewV4().String(),
 		Capacity: enum.ThreeGB,
 	}
 
-	orderConfirmedPayload := &event.OrderConfirmed {
+	orderConfirmed := &event.OrderConfirmed {
 		ConfirmedBy: "me",
 	}
 
-	orderRevisedPayload := &event.OrderRevised {
+	orderRevised := &event.OrderRevised {
 		RevisedBy: "me",
 		Reason:    "because I can",
 	}
 
-	event.RegisterEvent(orderCreatedPayload)
-	event.RegisterEvent(orderConfirmedPayload)
-	event.RegisterEvent(orderRevisedPayload)	
+	event.RegisterEvent(orderCreated)
+	event.RegisterEvent(orderConfirmed)
+	event.RegisterEvent(orderRevised)	
 
 	//simulate the creation of a new order aggregate by just generating a new UUID
-	aggregateUUID := uuid.NewV4().String()
+	aggregateUUID := orderCreated.UUID
 
-	createdEvent := event.BuildEvent(orderCreatedPayload, aggregateUUID)
-	confirmedEvent := event.BuildEvent(orderConfirmedPayload, aggregateUUID)
-	revisedEvent := event.BuildEvent(orderRevisedPayload, aggregateUUID)
+	createdEvent := event.BuildEvent(orderCreated, aggregateUUID)
+	confirmedEvent := event.BuildEvent(orderConfirmed, aggregateUUID)
+	revisedEvent := event.BuildEvent(orderRevised, aggregateUUID)
 
 	db.PersistEvent(createdEvent)
 	db.PersistEvent(confirmedEvent)
@@ -69,4 +70,36 @@ func TestGetEventForSnapshot(t *testing.T) {
 	for i := 0; i< len(events); i++ {
 		t.Log("event[", i, "]=", events[i])
 	}
+}
+
+func TestOrderCreatedEvent(t *testing.T) {
+	db := EventStore{}
+
+	var order event.Order
+
+	orderCreated := &event.OrderCreated {
+		UUID: uuid.NewV4().String(),
+		Capacity: enum.ThreeGB,
+	}
+
+	event.RegisterEvent(orderCreated)
+
+	e := event.BuildEvent(orderCreated, orderCreated.UUID)
+
+	e.ApplyChanges(&order)
+
+	t.Log("Event: ", e)
+	t.Log("Order: ", order)
+
+	assert.Equal(t, order.UUID, e.AggregateID, "Created order aggregate's id must match OrderCreatedEvent's id")
+	assert.Equal(t, order.Version, 1, "Created order's Version must be 1")
+	assert.Equal(t, order.Changes[0], e, "Created order's unpersisted changes must match OrderCreatedEvent's payload")
+
+	//err := db.PersistEvent(e)
+	err := db.Persist(&order.BaseAggregate)
+
+	assert.True(t, err==nil, "Insertion to db should not fail")
+
+	//order.MarkAsCommited()
+	assert.True(t, len(order.Changes)==0, "There must not be any pending changes anymore")
 }

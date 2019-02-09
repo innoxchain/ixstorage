@@ -2,7 +2,7 @@ package eventstore
 
 import (
 	"strconv"
-	"encoding/json"
+	//"encoding/json"
 	"time"
 	"database/sql"
 	"github.com/pkg/errors"
@@ -78,6 +78,33 @@ func (es EventStore) CreateEvent(event_seq int, aggregateid, eventtype, aggregat
 	return nil
 }
 
+
+func (es EventStore) Persist(aggregate *event.BaseAggregate) error {
+
+	sql := `
+	INSERT INTO events (event_seq, aggregateid, eventtype, aggregatetype, eventdata, creationtime) 
+	VALUES ($1, $2, $3, $4, $5, $6)`
+
+	for _, e :=  range aggregate.Changes {
+		persistentEvent, error := e.Serialize()
+
+		if error != nil {
+			log.Fatal(error)
+		}
+
+		_, err := db.Exec(sql, persistentEvent.Sequence, persistentEvent.AggregateID, persistentEvent.EventType, persistentEvent.AggregateType, persistentEvent.RawData, persistentEvent.CreatedAt)
+
+		if(err!=nil) {
+			return errors.Wrap(err, "error occured when inserting event")
+		}
+	}
+
+	aggregate.MarkAsCommited()
+
+	return nil
+}
+
+
 //PersistEvent persists an Event in the event store
 func (es EventStore) PersistEvent(e event.Event) error {
 	sql := `
@@ -132,6 +159,7 @@ func (es EventStore) GetSnapshot(aggregateid string) string {
 }
 
 
+/*
 func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []event.DomainEvent {
 
 	events := []event.DomainEvent{}
@@ -178,6 +206,7 @@ func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []e
 	}
 	return events
 }
+*/
 
 func (es EventStore) EventsForAggregate(aggregateid string, eventSeq int) []event.Event {
 

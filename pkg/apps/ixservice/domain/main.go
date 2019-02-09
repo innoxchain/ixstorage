@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"encoding/json"
 	"github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum"
@@ -10,15 +11,15 @@ import (
 )
 
 func main() {
-	/*
-		history := []event.DomainEvent{
-			&event.OrderCreatedEvent{AggregateID: "12345", CreatedAt: time.Now().String(), Capacity: enum.SixGB},
-			&event.OrderConfirmedEvent{AggregateID: "12345", CreatedAt: time.Now().String(), ConfirmedBy: "me"},
-		}
+	
+	//	history := []event.DomainEvent{
+	//		&event.OrderCreatedEvent{AggregateID: "12345", CreatedAt: time.Now().String(), Capacity: enum.SixGB},
+	//		&event.OrderConfirmedEvent{AggregateID: "12345", CreatedAt: time.Now().String(), ConfirmedBy: "me"},
+	//	}
 
-		order := GetOrderFromHistory(history)
-		log.Info("Order Aggregate from history: ", order)
-	*/
+	//	order := GetOrderFromHistory(history)
+	//	log.Info("Order Aggregate from history: ", order)
+	
 
 	//fulfillOrder(enum.TenGB, "me")
 	//fulfillOrder(enum.ThreeGB, "me too")
@@ -123,3 +124,4 @@ func marshalToJSON(object interface{}) string {
 	}
 	return string(res)
 }
+*/

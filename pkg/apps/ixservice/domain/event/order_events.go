@@ -1,15 +1,36 @@
 package event
 
 import (
+	"fmt"
 	"time"
 	"github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum"
 )
 
+type RevisedStatus struct {
+	RevisedBy string
+	Reason    string
+}
+
 type Order struct {
 	BaseAggregate
+	Capacity enum.Capacity
+	ConfirmedBy string
+	RevisedStat RevisedStatus
+}
+
+func (o *Order) String() string {
+	format := `Order:
+	uuid: %s
+	lastModified: %s
+	capacity: %s
+	(Pending Changes: %d)
+	(Version: %d)`
+
+	return fmt.Sprintf(format, o.UUID, o.LastModified, o.Capacity, len(o.Changes), o.Version)
 }
 
 type OrderCreated struct {
+	UUID string
 	Capacity enum.Capacity
 }
 
@@ -29,8 +50,10 @@ func (OrderCreated) GetCreatedAt() time.Time {
 	return time.Now()
 }
 
-func (OrderCreated) Apply(aggregate Aggregate, event Event) {
-	//order := aggregate.(*Order)
+func (oc OrderCreated) Apply(aggregate Aggregate, event Event) {
+	order := aggregate.(*Order)
+	order.UUID = oc.UUID
+	order.Capacity = oc.Capacity
 }
 
 
@@ -54,8 +77,9 @@ func (OrderConfirmed) GetCreatedAt() time.Time {
 	return time.Now()
 }
 
-func (OrderConfirmed) Apply(aggregate Aggregate, event Event) {
-	//order := aggregate.(*Order)
+func (oc OrderConfirmed) Apply(aggregate Aggregate, event Event) {
+	order := aggregate.(*Order)
+	order.ConfirmedBy = oc.ConfirmedBy
 }
 
 
@@ -80,6 +104,7 @@ func (OrderRevised) GetCreatedAt() time.Time {
 	return time.Now()
 }
 
-func (OrderRevised) Apply(aggregate Aggregate, event Event) {
-	//order := aggregate.(*Order)
+func (or OrderRevised) Apply(aggregate Aggregate, event Event) {
+	order := aggregate.(*Order)
+	order.RevisedStat = RevisedStatus{RevisedBy: or.RevisedBy, Reason: or.Reason}
 }
