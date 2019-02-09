@@ -1,6 +1,7 @@
 package event
 
 import (
+	//"strconv"
 	"time"
 	"encoding/json"
 	"reflect"
@@ -12,8 +13,17 @@ var eventRegistry = make(map[string]reflect.Type)
 type DomainEvent interface {
 	GetEventType() string
 	GetAggregateType() string
-	//GetCreatedAt() string
+	GetCreatedAt() time.Time
 	GetSequence() int
+	//Apply(aggregate Aggregate, event Event)
+}
+
+type BaseEvent interface {
+	GetEventType() string
+	GetAggregateType() string
+	GetCreatedAt() time.Time
+	GetSequence() int
+	Apply(aggregate Aggregate, event Event)
 }
 
 type Event struct {
@@ -46,11 +56,15 @@ func (e *Event) GetSequence() int {
 	return e.Sequence
 }
 
-/*
-func (e *Event) GetCreatedAt() string {
+func (e *Event) GetCreatedAt() time.Time {
 	return e.CreatedAt
 }
-*/
+
+func (e Event) apply(agg Aggregate) {
+	e.Payload.(BaseEvent).Apply(agg, e)
+	agg.incrementVersion()
+	agg.trackChanges(e)
+}
 
 func RegisterEvent(event interface{}) {
 	log.Info("RegisterEvent: ", event)
@@ -67,12 +81,14 @@ func makeInstance(name string) interface{} {
 	return reflect.New(eventRegistry[name]).Elem().Interface()
 }
 
+
 func (e *Event) MarshalJSON() (b []byte, err error) {
 
 	return json.Marshal(map[string]string{
 		"AggregateType": e.GetAggregateType(),
 		"EventType":     e.GetEventType(),
-		//"CreatedAt":     e.GetCreatedAt(),
+		//"Sequence": 	 strconv.Itoa(e.GetSequence()),
+		//"CreatedAt":     e.GetCreatedAt().String(),
 	})
 }
 
@@ -83,7 +99,7 @@ func BuildEvent(de DomainEvent, aggregateID string) Event {
 	event.AggregateType=de.GetAggregateType()
 	event.EventType=de.GetEventType()
 	event.Sequence=de.GetSequence()
-	event.CreatedAt=time.Now()
+	event.CreatedAt=de.GetCreatedAt()
 	event.Payload=de
 
 	return event

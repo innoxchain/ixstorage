@@ -1,7 +1,6 @@
 package event
 
 import (
-	"time"
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"reflect"
@@ -23,7 +22,7 @@ func TestDeserializeOrderRevisedEvent(t *testing.T) {
 		AggregateType: orderRevisedPayload.GetAggregateType(),
 		EventType:     orderRevisedPayload.GetEventType(),
 		Sequence:	   orderRevisedPayload.GetSequence(),
-		CreatedAt:     time.Now(),
+		CreatedAt:     orderRevisedPayload.GetCreatedAt(),
 		RawData:       "{\"RevisedBy\":\"me\",\"Reason\":\"not enough money\"}",
 	}
 
@@ -55,7 +54,7 @@ func TestSerializeOrderRevisedEvent(t *testing.T) {
 		AggregateType: orderRevisedPayload.GetAggregateType(),
 		EventType:     orderRevisedPayload.GetEventType(),
 		Sequence:	   orderRevisedPayload.GetSequence(),
-		CreatedAt:     time.Now(),
+		CreatedAt:     orderRevisedPayload.GetCreatedAt(),
 		Payload:	   orderRevisedPayload,
 	}
 

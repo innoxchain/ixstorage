@@ -1,39 +1,13 @@
 package event
 
 import (
+	"time"
 	"github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum"
 )
 
-/*
-import (
-	"time"
-)
-*/
-
-//OrderRevised is the event payload initiated when an existing order has been revised
-type OrderRevised struct {
-	RevisedBy string
-	Reason    string
+type Order struct {
+	BaseAggregate
 }
-
-func (OrderRevised) GetAggregateType() string {
-	return "order"
-}
-
-func (OrderRevised) GetEventType() string {
-	return "OrderRevised"
-}
-
-func (OrderRevised) GetSequence() int {
-	return 3
-}
-
-/*
-func (OrderRevised) GetCreatedAt() string {
-	return time.Now().String()
-}
-*/
-
 
 type OrderCreated struct {
 	Capacity enum.Capacity
@@ -51,6 +25,14 @@ func (OrderCreated) GetSequence() int {
 	return 1
 }
 
+func (OrderCreated) GetCreatedAt() time.Time {
+	return time.Now()
+}
+
+func (OrderCreated) Apply(aggregate Aggregate, event Event) {
+	//order := aggregate.(*Order)
+}
+
 
 type OrderConfirmed struct {
 	ConfirmedBy string
@@ -66,4 +48,38 @@ func (OrderConfirmed) GetEventType() string {
 
 func (OrderConfirmed) GetSequence() int {
 	return 2
+}
+
+func (OrderConfirmed) GetCreatedAt() time.Time {
+	return time.Now()
+}
+
+func (OrderConfirmed) Apply(aggregate Aggregate, event Event) {
+	//order := aggregate.(*Order)
+}
+
+
+type OrderRevised struct {
+	RevisedBy string
+	Reason    string
+}
+
+func (OrderRevised) GetAggregateType() string {
+	return "order"
+}
+
+func (OrderRevised) GetEventType() string {
+	return "OrderRevised"
+}
+
+func (OrderRevised) GetSequence() int {
+	return 3
+}
+
+func (OrderRevised) GetCreatedAt() time.Time {
+	return time.Now()
+}
+
+func (OrderRevised) Apply(aggregate Aggregate, event Event) {
+	//order := aggregate.(*Order)
 }

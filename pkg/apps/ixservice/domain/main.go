@@ -74,7 +74,7 @@ func createOrderWithSnapshot(capacity enum.Capacity, official string) *Order {
 
 	MarkOrderAsCommitted(order)
 
-	db.CreateSnapshot(order.UUID, string(marshalToJSON(order)), order.Version)
+	db.CreateSnapshot(order.UUID, marshalToJSON(order), order.Version)
 
 	event = order.confirmOrder(official)
 	db.CreateEvent(2, order.UUID, "OrderConfirmed", "order", marshalToJSON(event), time.Now())

@@ -131,6 +131,7 @@ func (es EventStore) GetSnapshot(aggregateid string) string {
 	return aggregate
 }
 
+
 func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []event.DomainEvent {
 
 	events := []event.DomainEvent{}
