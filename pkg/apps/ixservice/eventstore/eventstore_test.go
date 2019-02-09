@@ -72,7 +72,7 @@ func TestGetEventForSnapshot(t *testing.T) {
 	}
 }
 
-func TestOrderCreatedEvent(t *testing.T) {
+func TestEventsWithAggregates(t *testing.T) {
 	db := EventStore{}
 
 	var order event.Order
@@ -85,15 +85,27 @@ func TestOrderCreatedEvent(t *testing.T) {
 	event.RegisterEvent(orderCreated)
 
 	e := event.BuildEvent(orderCreated, orderCreated.UUID)
-
 	e.ApplyChanges(&order)
 
-	t.Log("Event: ", e)
-	t.Log("Order: ", order)
+	t.Log("OrderCreatedEvent: ", e)
+	//t.Log("Order: ", order)
 
 	assert.Equal(t, order.UUID, e.AggregateID, "Created order aggregate's id must match OrderCreatedEvent's id")
 	assert.Equal(t, order.Version, 1, "Created order's Version must be 1")
 	assert.Equal(t, order.Changes[0], e, "Created order's unpersisted changes must match OrderCreatedEvent's payload")
+
+
+	orderConfirmed := &event.OrderConfirmed {
+		ConfirmedBy: "me",
+	}
+
+	event.RegisterEvent(orderConfirmed)
+
+	e = event.BuildEvent(orderConfirmed, order.UUID)
+	e.ApplyChanges(&order)
+
+	t.Log("OrderConfirmedEvent: ", e)
+	//t.Log("Order: ", order)
 
 	//err := db.PersistEvent(e)
 	err := db.Persist(&order.BaseAggregate)
