@@ -4,6 +4,7 @@ replace github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum v0.0.0 =>
 
 require (
 	github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum v0.0.0
+	github.com/innoxchain/ixstorage/pkg/apps/ixservice/eventstore v0.0.0-20190105211345-1314a4ed27e9
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/kr/pty v1.1.3 // indirect
 	github.com/satori/go.uuid v1.2.0

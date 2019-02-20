@@ -13,6 +13,6 @@ func TestDomainEventRegisterEvents(t *testing.T) {
 	RegisterEvent(orderCreatedEvent)
 	RegisterEvent(orderConfirmedEvent)
 
-	assert.Equal(t, "OrderCreatedEvent", getEvent("OrderCreatedEvent").Name(), "Registered Event should be event.OrderCreatedEvent")
-	assert.Equal(t, "OrderConfirmedEvent", getEvent("OrderConfirmedEvent").Name(), "Registered Event should be event.OrderConfirmedEvent")
+	assert.Equal(t, orderCreatedEvent, getEvent("OrderCreatedEvent"), "Registered Event should be event.OrderCreatedEvent")
+	assert.Equal(t, orderConfirmedEvent, getEvent("OrderConfirmedEvent"), "Registered Event should be event.OrderConfirmedEvent")
 }

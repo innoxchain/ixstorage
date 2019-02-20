@@ -1,14 +1,16 @@
 package event
 
 import (
+	"fmt"
+	"encoding/json"
+	log "github.com/sirupsen/logrus"
+	"reflect"
 	"strconv"
 	"time"
-	"encoding/json"
-	"reflect"
-	log "github.com/sirupsen/logrus"
 )
 
-var eventRegistry = make(map[string]reflect.Type)
+//var eventRegistry = make(map[string]reflect.Type)
+var eventRegistry = make(map[string]interface{})
 
 type BaseEvent interface {
 	GetEventType() string
@@ -23,7 +25,7 @@ type Event struct {
 	AggregateType string
 	EventType     string
 	CreatedAt     time.Time
-	Sequence	  int
+	Sequence      int
 	Payload       interface{}
 }
 
@@ -32,73 +34,57 @@ type PersistentEvent struct {
 	AggregateType string
 	EventType     string
 	CreatedAt     time.Time
-	Sequence	  int
+	Sequence      int
 	RawData       string
 }
-
-/*
-func (e *Event) GetAggregateType() string {
-	return e.AggregateType
-}
-
-func (e *Event) GetEventType() string {
-	return e.EventType
-}
-
-func (e *Event) GetSequence() int {
-	return e.Sequence
-}
-
-func (e *Event) GetCreatedAt() time.Time {
-	return e.CreatedAt
-}
-*/
 
 func (e Event) ApplyChanges(agg Aggregate) {
 	e.Payload.(BaseEvent).Apply(agg, e)
 	agg.incrementVersion()
 	agg.trackChanges(e)
-	//agg.trackChanges(e.Payload.(BaseEvent))
 }
 
 func RegisterEvent(event interface{}) {
 	log.Info("RegisterEvent: ", event)
 
 	t := reflect.TypeOf(event).Elem()
-	eventRegistry[t.Name()] = t
+	eventRegistry[t.Name()] = event
+	//eventRegistry[t.Name()] = t
 }
 
-func getEvent(key string) reflect.Type {
+//func getEvent(key string) reflect.Type {
+func getEvent(key string) interface{} {
 	return eventRegistry[key]
 }
 
+/*
 func makeInstance(name string) interface{} {
 	return reflect.New(eventRegistry[name]).Elem().Interface()
 }
-
+*/
 
 func (e *Event) MarshalJSON() (b []byte, err error) {
-	payloadSer,_:=json.Marshal(e.Payload)
+	payloadSer, _ := json.Marshal(e.Payload)
 
 	return json.Marshal(map[string]string{
-		"AggregateId":	 e.AggregateID,
+		"AggregateId":   e.AggregateID,
 		"AggregateType": e.AggregateType,
 		"EventType":     e.EventType,
-		"Sequence": 	 strconv.Itoa(e.Sequence),
+		"Sequence":      strconv.Itoa(e.Sequence),
 		"CreatedAt":     e.CreatedAt.String(),
-		"Payload":		 string(payloadSer),
+		"Payload":       string(payloadSer),
 	})
 }
 
 func BuildEvent(de BaseEvent, aggregateID string) Event {
 	event := Event{}
 
-	event.AggregateID=aggregateID
-	event.AggregateType=de.GetAggregateType()
-	event.EventType=de.GetEventType()
-	event.Sequence=de.GetSequence()
-	event.CreatedAt=de.GetCreatedAt()
-	event.Payload=de
+	event.AggregateID = aggregateID
+	event.AggregateType = de.GetAggregateType()
+	event.EventType = de.GetEventType()
+	event.Sequence = de.GetSequence()
+	event.CreatedAt = de.GetCreatedAt()
+	event.Payload = de
 
 	return event
 }
@@ -112,7 +98,7 @@ func (e Event) Serialize() (PersistentEvent, error) {
 	result.CreatedAt = e.CreatedAt
 	result.EventType = e.EventType
 	result.Sequence = e.Sequence
-	
+
 	ser, err := json.Marshal(e.Payload)
 	if err != nil {
 		return PersistentEvent{}, err
@@ -129,21 +115,22 @@ func (e PersistentEvent) Deserialize() (Event, error) {
 
 	eventType := e.EventType
 
-	dataPointer := reflect.New(eventRegistry[eventType])
-	dataValue := dataPointer.Elem()
-	iface := dataValue.Interface()
+	objType := reflect.TypeOf(getEvent(eventType)).Elem()
+    obj := reflect.New(objType).Interface()
 
-	err = json.Unmarshal([]byte(e.RawData), &iface)
+	err = json.Unmarshal([]byte(e.RawData), &obj)
 	if err != nil {
 		return Event{}, err
 	}
+
+	fmt.Printf("obj = %#v\n", obj)
 
 	result.AggregateID = e.AggregateID
 	result.AggregateType = e.AggregateType
 	result.EventType = e.EventType
 	result.CreatedAt = e.CreatedAt
 	result.Sequence = e.Sequence
-	result.Payload = iface
+	result.Payload = obj
 
 	return result, nil
 }

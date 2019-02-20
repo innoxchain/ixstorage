@@ -1,16 +1,15 @@
 package event
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
-	"reflect"
 	"fmt"
 	"github.com/satori/go.uuid"
+	"github.com/stretchr/testify/assert"
+	//"reflect"
+	"testing"
 )
 
-
 func TestDeserializeOrderRevisedEvent(t *testing.T) {
-	orderRevisedPayload := &OrderRevised {
+	orderRevisedPayload := &OrderRevised{
 		RevisedBy: "me",
 		Reason:    "not enough money",
 	}
@@ -21,7 +20,7 @@ func TestDeserializeOrderRevisedEvent(t *testing.T) {
 		AggregateID:   uuid.NewV4().String(),
 		AggregateType: orderRevisedPayload.GetAggregateType(),
 		EventType:     orderRevisedPayload.GetEventType(),
-		Sequence:	   orderRevisedPayload.GetSequence(),
+		Sequence:      orderRevisedPayload.GetSequence(),
 		CreatedAt:     orderRevisedPayload.GetCreatedAt(),
 		RawData:       "{\"RevisedBy\":\"me\",\"Reason\":\"not enough money\"}",
 	}
@@ -32,19 +31,15 @@ func TestDeserializeOrderRevisedEvent(t *testing.T) {
 		fmt.Println("couldn't deserialize PersistentEvent: ", pe)
 	}
 
-	v := reflect.ValueOf(event.Payload)
-	kv := v.MapKeys()
-	strct := v.MapIndex(kv[0])
+	t.Log("Event Payload: ", event.Payload)
 
-	assert.Equal(t, strct.Interface().(string), "me", "RevisedBy must be \"me\"")
-
-	strct = v.MapIndex(kv[1])
-	assert.Equal(t, strct.Interface().(string), "not enough money", "Reason must be \"not enough money\"")
+	assert.Equal(t, event.Payload.(*OrderRevised).RevisedBy, "me", "RevisedBy must be \"me\"")
+	assert.Equal(t, event.Payload.(*OrderRevised).Reason, "not enough money", "Reason must be \"not enough money\"")
 }
 
 func TestSerializeOrderRevisedEvent(t *testing.T) {
 
-	orderRevisedPayload := OrderRevised {
+	orderRevisedPayload := OrderRevised{
 		RevisedBy: "me",
 		Reason:    "not enough money",
 	}
@@ -53,9 +48,9 @@ func TestSerializeOrderRevisedEvent(t *testing.T) {
 		AggregateID:   uuid.NewV4().String(),
 		AggregateType: orderRevisedPayload.GetAggregateType(),
 		EventType:     orderRevisedPayload.GetEventType(),
-		Sequence:	   orderRevisedPayload.GetSequence(),
+		Sequence:      orderRevisedPayload.GetSequence(),
 		CreatedAt:     orderRevisedPayload.GetCreatedAt(),
-		Payload:	   orderRevisedPayload,
+		Payload:       orderRevisedPayload,
 	}
 
 	persistentEvent, err := event.Serialize()
@@ -64,7 +59,7 @@ func TestSerializeOrderRevisedEvent(t *testing.T) {
 		fmt.Println("couldn't serialize Event: ", event)
 	}
 
-	expected := "{\"RevisedBy\":\"me\",\"Reason\":\"not enough money\"}"
+	expected := "{\"revisedBy\":\"me\",\"reason\":\"not enough money\"}"
 
 	assert.Equal(t, expected, persistentEvent.RawData, "Expected result doesn't match!")
 }

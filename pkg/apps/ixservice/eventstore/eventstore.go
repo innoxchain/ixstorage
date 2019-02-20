@@ -3,12 +3,12 @@ package eventstore
 import (
 	"strconv"
 	//"encoding/json"
-	"time"
 	"database/sql"
-	"github.com/pkg/errors"
 	"github.com/innoxchain/ixstorage/config"
 	"github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/event"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -17,8 +17,8 @@ const JSON_DB_CONFIG_PATH = "../../../../config/local_db.json"
 
 type DbConfig struct {
 	ConnectString string
-	DatabaseName string
-	SslMode string
+	DatabaseName  string
+	SslMode       string
 }
 
 type EventStore struct{}
@@ -29,21 +29,21 @@ func init() {
 	cfg := DbConfig{}
 	err := config.LoadConfig(JSON_DB_CONFIG_PATH, &cfg)
 
-	if(err!=nil) {
+	if err != nil {
 		log.Fatal("Couldn't load JSON database configuration")
 	}
 
 	log.WithFields(log.Fields{
 		"ConnectString": cfg.ConnectString,
-		"DatabaseName": cfg.DatabaseName,
-		"SslMode": cfg.SslMode,
-	  }).Info("DB Configuration")
+		"DatabaseName":  cfg.DatabaseName,
+		"SslMode":       cfg.SslMode,
+	}).Info("DB Configuration")
 
-	db, err = sql.Open("postgres", cfg.ConnectString + "/" + cfg.DatabaseName + "?sslmode=" + cfg.SslMode)
+	db, err = sql.Open("postgres", cfg.ConnectString+"/"+cfg.DatabaseName+"?sslmode="+cfg.SslMode)
 
 	log.Info("Connected to Database")
 
-	if(err!=nil) {
+	if err != nil {
 		log.Fatal("Error connecting to database: ", err)
 	}
 
@@ -52,16 +52,14 @@ func init() {
 
 func createTables() {
 	if _, err := db.Exec(
-		"CREATE TABLE IF NOT EXISTS events (event_seq INT, aggregateid STRING, eventtype STRING, aggregatetype STRING, eventdata STRING, creationtime TIMESTAMP, PRIMARY KEY (event_seq, aggregateid))");
-		err != nil {
-			log.Fatal(err)
-		}
+		"CREATE TABLE IF NOT EXISTS events (event_seq INT, aggregateid STRING, eventtype STRING, aggregatetype STRING, eventdata STRING, creationtime TIMESTAMP, PRIMARY KEY (event_seq, aggregateid))"); err != nil {
+		log.Fatal(err)
+	}
 
 	if _, err := db.Exec(
-		"CREATE TABLE IF NOT EXISTS snapshots (aggregateid STRING, snapshot_event_seq INT, aggregatestate STRING, PRIMARY KEY (aggregateid, snapshot_event_seq))");
-			err != nil {
-				log.Fatal(err)
-			}
+		"CREATE TABLE IF NOT EXISTS snapshots (aggregateid STRING, snapshot_event_seq INT, aggregatestate STRING, PRIMARY KEY (aggregateid, snapshot_event_seq))"); err != nil {
+		log.Fatal(err)
+	}
 }
 
 //CreateEvent is deprecated
@@ -69,15 +67,14 @@ func (es EventStore) CreateEvent(event_seq int, aggregateid, eventtype, aggregat
 	sql := `
 		INSERT INTO events (event_seq, aggregateid, eventtype, aggregatetype, eventdata, creationtime) 
 		VALUES ($1, $2, $3, $4, $5, $6)`
-	
-		_, err := db.Exec(sql, event_seq, aggregateid, eventtype, aggregatetype, data, creationtime)
 
-		if(err!=nil) {
-			return errors.Wrap(err, "error occured when inserting event")
-		}
+	_, err := db.Exec(sql, event_seq, aggregateid, eventtype, aggregatetype, data, creationtime)
+
+	if err != nil {
+		return errors.Wrap(err, "error occured when inserting event")
+	}
 	return nil
 }
-
 
 func (es EventStore) Persist(aggregate *event.BaseAggregate) error {
 
@@ -85,7 +82,7 @@ func (es EventStore) Persist(aggregate *event.BaseAggregate) error {
 	INSERT INTO events (event_seq, aggregateid, eventtype, aggregatetype, eventdata, creationtime) 
 	VALUES ($1, $2, $3, $4, $5, $6)`
 
-	for _, e :=  range aggregate.Changes {
+	for _, e := range aggregate.Changes {
 		persistentEvent, error := e.Serialize()
 
 		if error != nil {
@@ -94,7 +91,7 @@ func (es EventStore) Persist(aggregate *event.BaseAggregate) error {
 
 		_, err := db.Exec(sql, persistentEvent.Sequence, persistentEvent.AggregateID, persistentEvent.EventType, persistentEvent.AggregateType, persistentEvent.RawData, persistentEvent.CreatedAt)
 
-		if(err!=nil) {
+		if err != nil {
 			return errors.Wrap(err, "error occured when inserting event")
 		}
 	}
@@ -104,24 +101,23 @@ func (es EventStore) Persist(aggregate *event.BaseAggregate) error {
 	return nil
 }
 
-
 //PersistEvent persists an Event in the event store
 func (es EventStore) PersistEvent(e event.Event) error {
 	sql := `
 		INSERT INTO events (event_seq, aggregateid, eventtype, aggregatetype, eventdata, creationtime) 
 		VALUES ($1, $2, $3, $4, $5, $6)`
-	
-		persistentEvent, error := e.Serialize()
 
-		if error != nil {
-			log.Fatal(error)
-		}
+	persistentEvent, error := e.Serialize()
 
-		_, err := db.Exec(sql, persistentEvent.Sequence, persistentEvent.AggregateID, persistentEvent.EventType, persistentEvent.AggregateType, persistentEvent.RawData, persistentEvent.CreatedAt)
+	if error != nil {
+		log.Fatal(error)
+	}
 
-		if(err!=nil) {
-			return errors.Wrap(err, "error occured when inserting event")
-		}
+	_, err := db.Exec(sql, persistentEvent.Sequence, persistentEvent.AggregateID, persistentEvent.EventType, persistentEvent.AggregateType, persistentEvent.RawData, persistentEvent.CreatedAt)
+
+	if err != nil {
+		return errors.Wrap(err, "error occured when inserting event")
+	}
 	return nil
 }
 
@@ -129,12 +125,12 @@ func (es EventStore) CreateSnapshot(aggregateid, aggregatestate string, snapshot
 	sql := `
 		INSERT INTO snapshots (aggregateid, snapshot_event_seq, aggregatestate) 
 		VALUES ($1, $2, $3)`
-	
-		_, err := db.Exec(sql, aggregateid, snapshot_event_seq, aggregatestate)
 
-		if(err!=nil) {
-			return errors.Wrap(err, "error occured when inserting snapshot")
-		}
+	_, err := db.Exec(sql, aggregateid, snapshot_event_seq, aggregatestate)
+
+	if err != nil {
+		return errors.Wrap(err, "error occured when inserting snapshot")
+	}
 	return nil
 }
 
@@ -153,11 +149,10 @@ func (es EventStore) GetSnapshot(aggregateid string) string {
 		if err := rows.Scan(&aggregatestate); err != nil {
 			log.Fatal(err)
 		}
-		aggregate=aggregatestate
+		aggregate = aggregatestate
 	}
 	return aggregate
 }
-
 
 /*
 func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []event.DomainEvent {
@@ -185,10 +180,10 @@ func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []e
 				if(err!=nil) {
 					log.Fatal("Error deserializing event! ", err)
 				}
-				
-				events = append(events, 
+
+				events = append(events,
 					&event.OrderCreatedEvent{
-						Event: event.Event{AggregateID: aggregateid, EventType: eventtype, CreatedAt: creationtime}, 
+						Event: event.Event{AggregateID: aggregateid, EventType: eventtype, CreatedAt: creationtime},
 						Capacity: deserializedEvent.Capacity})
 
 			case "OrderConfirmed":
@@ -198,9 +193,9 @@ func (es EventStore) GetEventsForAggregate(aggregateid string, eventSeq int) []e
 					log.Fatal("Error deserializing event! ", err)
 				}
 
-				events = append(events, 
+				events = append(events,
 					&event.OrderConfirmedEvent{
-						Event: event.Event{AggregateID: aggregateid, EventType: eventtype, CreatedAt: creationtime}, 
+						Event: event.Event{AggregateID: aggregateid, EventType: eventtype, CreatedAt: creationtime},
 						ConfirmedBy: deserializedEvent.ConfirmedBy})
 		}
 	}
@@ -229,16 +224,16 @@ func (es EventStore) EventsForAggregate(aggregateid string, eventSeq int) []even
 		seq, _ := strconv.Atoi(event_seq)
 
 		pe := event.PersistentEvent{
-			AggregateID: 	aggregateid,
-			AggregateType: 	aggregatetype,
-			EventType: 		eventtype,
-			CreatedAt: 		creationtime,
-			Sequence:		seq,
-			RawData: 		eventdata,
+			AggregateID:   aggregateid,
+			AggregateType: aggregatetype,
+			EventType:     eventtype,
+			CreatedAt:     creationtime,
+			Sequence:      seq,
+			RawData:       eventdata,
 		}
 
 		e, err := pe.Deserialize()
-		if err!=nil {
+		if err != nil {
 			log.Fatal("couldn't deserialize PersistentEvent: ", pe)
 		}
 

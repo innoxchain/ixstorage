@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	
+
 	//	history := []event.DomainEvent{
 	//		&event.OrderCreatedEvent{AggregateID: "12345", CreatedAt: time.Now().String(), Capacity: enum.SixGB},
 	//		&event.OrderConfirmedEvent{AggregateID: "12345", CreatedAt: time.Now().String(), ConfirmedBy: "me"},
@@ -19,7 +19,7 @@ func main() {
 
 	//	order := GetOrderFromHistory(history)
 	//	log.Info("Order Aggregate from history: ", order)
-	
+
 
 	//fulfillOrder(enum.TenGB, "me")
 	//fulfillOrder(enum.ThreeGB, "me too")

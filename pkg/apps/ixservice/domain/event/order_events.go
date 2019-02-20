@@ -1,9 +1,12 @@
 package event
 
 import (
+	"github.com/satori/go.uuid"
+	//"strconv"
+	//"encoding/json"
 	"fmt"
-	"time"
 	"github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum"
+	"time"
 )
 
 type RevisedStatus struct {
@@ -13,7 +16,7 @@ type RevisedStatus struct {
 
 type Order struct {
 	BaseAggregate
-	Capacity enum.Capacity
+	Capacity    enum.Capacity
 	ConfirmedBy string
 	RevisedStat RevisedStatus
 }
@@ -29,9 +32,20 @@ func (o *Order) String() string {
 	return fmt.Sprintf(format, o.UUID, o.LastModified, o.Capacity, len(o.Changes), o.Version)
 }
 
-type OrderCreated struct {
-	UUID string
+type CreateOrderCommand struct {
 	Capacity enum.Capacity
+}
+
+func (coc CreateOrderCommand) CreateBaseEvent() BaseEvent {
+	return OrderCreated{
+		UUID:     uuid.NewV4().String(),
+		Capacity: coc.Capacity,
+	}
+}
+
+type OrderCreated struct {
+	UUID     string			`json:"uuid"`
+	Capacity enum.Capacity  `json:"capacity"`
 }
 
 func (OrderCreated) GetAggregateType() string {
@@ -47,7 +61,7 @@ func (OrderCreated) GetSequence() int {
 }
 
 func (OrderCreated) GetCreatedAt() time.Time {
-	return time.Now()
+	return time.Now().UTC()
 }
 
 func (oc OrderCreated) Apply(aggregate Aggregate, event Event) {
@@ -56,9 +70,8 @@ func (oc OrderCreated) Apply(aggregate Aggregate, event Event) {
 	order.Capacity = oc.Capacity
 }
 
-
 type OrderConfirmed struct {
-	ConfirmedBy string
+	ConfirmedBy string `json:"confirmedBy"`
 }
 
 func (OrderConfirmed) GetAggregateType() string {
@@ -74,7 +87,7 @@ func (OrderConfirmed) GetSequence() int {
 }
 
 func (OrderConfirmed) GetCreatedAt() time.Time {
-	return time.Now()
+	return time.Now().UTC()
 }
 
 func (oc OrderConfirmed) Apply(aggregate Aggregate, event Event) {
@@ -82,10 +95,9 @@ func (oc OrderConfirmed) Apply(aggregate Aggregate, event Event) {
 	order.ConfirmedBy = oc.ConfirmedBy
 }
 
-
 type OrderRevised struct {
-	RevisedBy string
-	Reason    string
+	RevisedBy string `json:"revisedBy"`
+	Reason    string `json:"reason"`
 }
 
 func (OrderRevised) GetAggregateType() string {
@@ -101,7 +113,7 @@ func (OrderRevised) GetSequence() int {
 }
 
 func (OrderRevised) GetCreatedAt() time.Time {
-	return time.Now()
+	return time.Now().UTC()
 }
 
 func (or OrderRevised) Apply(aggregate Aggregate, event Event) {
