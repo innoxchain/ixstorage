@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-//var eventRegistry = make(map[string]reflect.Type)
 var eventRegistry = make(map[string]interface{})
 
 type BaseEvent interface {
@@ -17,7 +16,7 @@ type BaseEvent interface {
 	GetAggregateType() string
 	GetCreatedAt() time.Time
 	GetSequence() int
-	Apply(aggregate Aggregate, event Event)
+	Apply(aggregate Aggregate, event *Event)
 }
 
 type Event struct {
@@ -39,7 +38,7 @@ type PersistentEvent struct {
 }
 
 func (e Event) ApplyChanges(agg Aggregate) {
-	e.Payload.(BaseEvent).Apply(agg, e)
+	e.Payload.(BaseEvent).Apply(agg, &e)
 	agg.incrementVersion()
 	agg.trackChanges(e)
 }
@@ -49,19 +48,11 @@ func RegisterEvent(event interface{}) {
 
 	t := reflect.TypeOf(event).Elem()
 	eventRegistry[t.Name()] = event
-	//eventRegistry[t.Name()] = t
 }
 
-//func getEvent(key string) reflect.Type {
 func getEvent(key string) interface{} {
 	return eventRegistry[key]
 }
-
-/*
-func makeInstance(name string) interface{} {
-	return reflect.New(eventRegistry[name]).Elem().Interface()
-}
-*/
 
 func (e *Event) MarshalJSON() (b []byte, err error) {
 	payloadSer, _ := json.Marshal(e.Payload)

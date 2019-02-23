@@ -1,7 +1,7 @@
 package event
 
 import (
-	"github.com/satori/go.uuid"
+	//"github.com/satori/go.uuid"
 	//"strconv"
 	//"encoding/json"
 	"fmt"
@@ -33,12 +33,13 @@ func (o *Order) String() string {
 }
 
 type CreateOrderCommand struct {
+	UUID string
 	Capacity enum.Capacity
 }
 
 func (coc CreateOrderCommand) CreateBaseEvent() BaseEvent {
 	return OrderCreated{
-		UUID:     uuid.NewV4().String(),
+		UUID:     coc.UUID,
 		Capacity: coc.Capacity,
 	}
 }
@@ -64,10 +65,11 @@ func (OrderCreated) GetCreatedAt() time.Time {
 	return time.Now().UTC()
 }
 
-func (oc OrderCreated) Apply(aggregate Aggregate, event Event) {
+func (oc OrderCreated) Apply(aggregate Aggregate, event *Event) {
 	order := aggregate.(*Order)
 	order.UUID = oc.UUID
 	order.Capacity = oc.Capacity
+	event.AggregateID = oc.UUID
 }
 
 type OrderConfirmed struct {
@@ -90,7 +92,7 @@ func (OrderConfirmed) GetCreatedAt() time.Time {
 	return time.Now().UTC()
 }
 
-func (oc OrderConfirmed) Apply(aggregate Aggregate, event Event) {
+func (oc OrderConfirmed) Apply(aggregate Aggregate, event *Event) {
 	order := aggregate.(*Order)
 	order.ConfirmedBy = oc.ConfirmedBy
 }
@@ -116,7 +118,7 @@ func (OrderRevised) GetCreatedAt() time.Time {
 	return time.Now().UTC()
 }
 
-func (or OrderRevised) Apply(aggregate Aggregate, event Event) {
+func (or OrderRevised) Apply(aggregate Aggregate, event *Event) {
 	order := aggregate.(*Order)
 	order.RevisedStat = RevisedStatus{RevisedBy: or.RevisedBy, Reason: or.Reason}
 }

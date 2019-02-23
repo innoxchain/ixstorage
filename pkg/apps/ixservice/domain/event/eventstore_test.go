@@ -1,4 +1,4 @@
-package eventstore
+package event
 
 import (
 	"encoding/json"
@@ -6,21 +6,18 @@ import (
 	"github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	//"time"
 	"testing"
-
-	"github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/event"
 )
 
 func TestStoreEvent(t *testing.T) {
 	db := EventStore{}
 
-	orderRevisedPayload := event.OrderRevised{
+	orderRevisedPayload := OrderRevised{
 		RevisedBy: "me",
 		Reason:    "not enough money",
 	}
 
-	event := event.BuildEvent(orderRevisedPayload, uuid.NewV4().String())
+	event := BuildEvent(orderRevisedPayload, uuid.NewV4().String())
 
 	t.Log(event)
 
@@ -33,30 +30,30 @@ func TestGetEventForSnapshot(t *testing.T) {
 
 	db := EventStore{}
 
-	orderCreated := &event.OrderCreated{
+	orderCreated := &OrderCreated{
 		UUID:     uuid.NewV4().String(),
 		Capacity: enum.ThreeGB,
 	}
 
-	orderConfirmed := &event.OrderConfirmed{
+	orderConfirmed := &OrderConfirmed{
 		ConfirmedBy: "me",
 	}
 
-	orderRevised := &event.OrderRevised{
+	orderRevised := &OrderRevised{
 		RevisedBy: "me",
 		Reason:    "because I can",
 	}
 
-	event.RegisterEvent(orderCreated)
-	event.RegisterEvent(orderConfirmed)
-	event.RegisterEvent(orderRevised)
+	RegisterEvent(orderCreated)
+	RegisterEvent(orderConfirmed)
+	RegisterEvent(orderRevised)
 
 	//simulate the creation of a new order aggregate by just generating a new UUID
 	aggregateUUID := orderCreated.UUID
 
-	createdEvent := event.BuildEvent(orderCreated, aggregateUUID)
-	confirmedEvent := event.BuildEvent(orderConfirmed, aggregateUUID)
-	revisedEvent := event.BuildEvent(orderRevised, aggregateUUID)
+	createdEvent := BuildEvent(orderCreated, aggregateUUID)
+	confirmedEvent := BuildEvent(orderConfirmed, aggregateUUID)
+	revisedEvent := BuildEvent(orderRevised, aggregateUUID)
 
 	db.PersistEvent(createdEvent)
 	db.PersistEvent(confirmedEvent)
@@ -76,16 +73,16 @@ func TestGetEventForSnapshot(t *testing.T) {
 func TestEventsWithAggregates(t *testing.T) {
 	//db := EventStore{}
 
-	var order event.Order
+	var order Order
 
-	orderCreated := &event.OrderCreated{
+	orderCreated := &OrderCreated{
 		UUID:     uuid.NewV4().String(),
 		Capacity: enum.ThreeGB,
 	}
 
-	event.RegisterEvent(orderCreated)
+	RegisterEvent(orderCreated)
 
-	e := event.BuildEvent(orderCreated, orderCreated.UUID)
+	e := BuildEvent(orderCreated, orderCreated.UUID)
 	e.ApplyChanges(&order)
 
 	t.Log("OrderCreatedEvent: ", e)
@@ -95,13 +92,13 @@ func TestEventsWithAggregates(t *testing.T) {
 	assert.Equal(t, order.Version, 1, "Created order's Version must be 1")
 	assert.Equal(t, order.Changes[0], e, "Created order's unpersisted changes must match OrderCreatedEvent's payload")
 
-	orderConfirmed := &event.OrderConfirmed{
+	orderConfirmed := &OrderConfirmed{
 		ConfirmedBy: "me",
 	}
 
-	event.RegisterEvent(orderConfirmed)
+	RegisterEvent(orderConfirmed)
 
-	e = event.BuildEvent(orderConfirmed, order.UUID)
+	e = BuildEvent(orderConfirmed, order.UUID)
 	e.ApplyChanges(&order)
 
 	t.Log("OrderConfirmedEvent: ", e)
@@ -114,7 +111,7 @@ func TestEventsWithAggregates(t *testing.T) {
 	tmpOrder := order
 	tmpOrder.MarkAsCommited()
 
-	event.Replay(&tmpOrder, order.Changes)
+	Replay(&tmpOrder, order.Changes)
 
 	t.Log("tmpOrder: ", tmpOrder)
 
@@ -129,17 +126,17 @@ func TestSnapshots(t *testing.T) {
 
 	db := EventStore{}
 
-	var order event.Order
+	var order Order
 
 	//first we create a new event OrderCreated, register it with the
 	//event registry and apply the changes to the aggregate
-	orderCreated := &event.OrderCreated{
+	orderCreated := &OrderCreated{
 		UUID:     uuid.NewV4().String(),
 		Capacity: enum.ThreeGB,
 	}
 
-	event.RegisterEvent(orderCreated)
-	e := event.BuildEvent(orderCreated, orderCreated.UUID)
+	RegisterEvent(orderCreated)
+	e := BuildEvent(orderCreated, orderCreated.UUID)
 	e.ApplyChanges(&order)
 
 	//then we persist the aggregate and it's pending changes
@@ -151,20 +148,20 @@ func TestSnapshots(t *testing.T) {
 
 	//Now, additional events will occur over time and we
 	//will create and persist them as usual.
-	orderConfirmed := &event.OrderConfirmed{
+	orderConfirmed := &OrderConfirmed{
 		ConfirmedBy: "me",
 	}
-	event.RegisterEvent(orderConfirmed)
-	e = event.BuildEvent(orderConfirmed, order.UUID)
+	RegisterEvent(orderConfirmed)
+	e = BuildEvent(orderConfirmed, order.UUID)
 	e.ApplyChanges(&order)
 	db.Persist(&order.BaseAggregate)
 
-	orderRevised := &event.OrderRevised{
+	orderRevised := &OrderRevised{
 		RevisedBy: "me",
 		Reason:    "because I can",
 	}
-	event.RegisterEvent(orderRevised)
-	e = event.BuildEvent(orderRevised, order.UUID)
+	RegisterEvent(orderRevised)
+	e = BuildEvent(orderRevised, order.UUID)
 	e.ApplyChanges(&order)
 	db.Persist(&order.BaseAggregate)
 
@@ -177,7 +174,7 @@ func TestSnapshots(t *testing.T) {
 	//to save performance when loading large datasets.
 	snapshot := db.GetSnapshot(order.UUID)
 
-	deserializedOrder := &event.Order{}
+	deserializedOrder := &Order{}
 	err := json.Unmarshal([]byte(snapshot), deserializedOrder)
 	if err != nil {
 		log.Fatal("Error deserializing aggregate! ", err)

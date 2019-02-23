@@ -13,6 +13,8 @@ type Aggregate interface {
 	GetAggregateID() string
 	trackChanges(e Event)
 	incrementVersion()
+	GetChanges() []Event
+	MarkAsCommited()
 }
 
 type BaseAggregate struct {
@@ -20,6 +22,10 @@ type BaseAggregate struct {
 	Version      int       `json:"version"`
 	LastModified time.Time `json:"lastModified"`
 	Changes      []Event   `json:"changes"`
+}
+
+func (a *BaseAggregate) GetChanges() []Event {
+	return a.Changes
 }
 
 func (a *BaseAggregate) GetAggregateID() string {

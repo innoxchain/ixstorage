@@ -2,6 +2,7 @@ package event
 
 import (
 	log "github.com/sirupsen/logrus"
+	//store "github.com/innoxchain/ixstorage/pkg/apps/ixservice/eventstore"
 )
 
 type Command interface {
@@ -9,21 +10,16 @@ type Command interface {
 }
 
 func ApplyCommand(command Command, aggregate Aggregate) {
+
+	db := EventStore{}
 	
 	baseEvent:=command.CreateBaseEvent()
-
-	RegisterEvent(baseEvent)
 
 	event:=BuildEvent(baseEvent, aggregate.GetAggregateID())
 
 	event.ApplyChanges(aggregate)
 
 	log.Info("AGGREGATE AFTER COMMAND WAS APPLIED: ", aggregate)
-	
-	/*
-	event.RegisterEvent(orderConfirmed)
-	e = event.BuildEvent(orderConfirmed, order.UUID)
-	e.ApplyChanges(&order)
-	db.Persist(&order.BaseAggregate)
-	*/
+
+	db.Persist(aggregate)
 }
