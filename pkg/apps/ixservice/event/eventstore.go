@@ -11,7 +11,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const JSON_DB_CONFIG_PATH = "../../../../../config/local_db.json"
+const JSON_DB_CONFIG_PATH = "./dbconfig/local_db.json"
 
 type DbConfig struct {
 	ConnectString string
@@ -58,20 +58,6 @@ func createTables() {
 		"CREATE TABLE IF NOT EXISTS snapshots (aggregateid STRING, snapshot_event_seq INT, aggregatestate STRING, PRIMARY KEY (aggregateid, snapshot_event_seq))"); err != nil {
 		log.Fatal(err)
 	}
-}
-
-//CreateEvent is deprecated
-func (es EventStore) CreateEvent(event_seq int, aggregateid, eventtype, aggregatetype, data string, creationtime time.Time) error {
-	sql := `
-		INSERT INTO events (event_seq, aggregateid, eventtype, aggregatetype, eventdata, creationtime) 
-		VALUES ($1, $2, $3, $4, $5, $6)`
-
-	_, err := db.Exec(sql, event_seq, aggregateid, eventtype, aggregatetype, data, creationtime)
-
-	if err != nil {
-		return errors.Wrap(err, "error occured when inserting event")
-	}
-	return nil
 }
 
 func (es EventStore) Persist(aggregate Aggregate) error {

@@ -1,12 +1,22 @@
 package event
 
 import (
-	"fmt"
 	"github.com/satori/go.uuid"
-	"github.com/stretchr/testify/assert"
-	//"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
+
+func TestDomainEventRegisterEvents(t *testing.T) {
+	orderCreated := &OrderCreated{}
+	orderConfirmed := &OrderConfirmed{}
+
+	RegisterEvent(orderCreated)
+	RegisterEvent(orderConfirmed)
+
+	assert.Equal(t, orderCreated, getEvent("OrderCreated"), "Registered Event should be event.OrderCreatedEvent")
+	assert.Equal(t, orderConfirmed, getEvent("OrderConfirmed"), "Registered Event should be event.OrderConfirmedEvent")
+}
 
 func TestDeserializeOrderRevisedEvent(t *testing.T) {
 	orderRevisedPayload := &OrderRevised{
@@ -28,7 +38,7 @@ func TestDeserializeOrderRevisedEvent(t *testing.T) {
 	event, err := pe.Deserialize()
 
 	if err != nil {
-		fmt.Println("couldn't deserialize PersistentEvent: ", pe)
+		t.Fatal("couldn't deserialize PersistentEvent: ", pe)
 	}
 
 	t.Log("Event Payload: ", event.Payload)
@@ -36,6 +46,7 @@ func TestDeserializeOrderRevisedEvent(t *testing.T) {
 	assert.Equal(t, event.Payload.(*OrderRevised).RevisedBy, "me", "RevisedBy must be \"me\"")
 	assert.Equal(t, event.Payload.(*OrderRevised).Reason, "not enough money", "Reason must be \"not enough money\"")
 }
+
 
 func TestSerializeOrderRevisedEvent(t *testing.T) {
 
@@ -56,7 +67,7 @@ func TestSerializeOrderRevisedEvent(t *testing.T) {
 	persistentEvent, err := event.Serialize()
 
 	if err != nil {
-		fmt.Println("couldn't serialize Event: ", event)
+		t.Fatal("couldn't serialize Event: ", event)
 	}
 
 	expected := "{\"revisedBy\":\"me\",\"reason\":\"not enough money\"}"

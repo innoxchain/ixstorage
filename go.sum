@@ -2,6 +2,8 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/innoxchain/ixstorage/pkg/apps/ixclient v0.0.1 h1:WUoXNBDE6F9DbQ0+9r1MM3N+Tt5hZga6IZlfUsbF7R0=
 github.com/innoxchain/ixstorage/pkg/apps/ixclient v0.0.1/go.mod h1:TRJnUMJZbhI7g3FSvbddGykOxEe5gGayCuEnIx7IcX4=
+github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum v0.0.0-20190105211345-1314a4ed27e9 h1:JK/BFl5FK25fVF0VEhmB8ECBspm4z289W4e438Q4yo4=
+github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum v0.0.0-20190105211345-1314a4ed27e9/go.mod h1:BfsO9kbN8xHk26kvHfOJNVPZqkxK2ZBmIZPKuO7dkRo=
 github.com/innoxchain/ixstorage/pkg/apps/ixservice/eventstore v0.0.0-20190105211345-1314a4ed27e9 h1:yzgnrDtI4HsaAQA0qrxfIE7ENeDHUlK2v6+4aFycD+Q=
 github.com/innoxchain/ixstorage/pkg/apps/ixservice/eventstore v0.0.0-20190105211345-1314a4ed27e9/go.mod h1:JgPDBvJ7+SIYPsIQKipEPWxT/ekIX9YyQeZUqF4gp9s=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=

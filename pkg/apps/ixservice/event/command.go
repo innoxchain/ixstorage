@@ -22,4 +22,6 @@ func ApplyCommand(command Command, aggregate Aggregate) {
 	log.Info("AGGREGATE AFTER COMMAND WAS APPLIED: ", aggregate)
 
 	db.Persist(aggregate)
+
+	log.Info("AGGREGATE AFTER IT WAS PERSISTED TO DATABASE: ", aggregate)
 }

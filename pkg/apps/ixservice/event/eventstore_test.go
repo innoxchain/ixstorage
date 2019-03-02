@@ -2,7 +2,6 @@ package event
 
 import (
 	"encoding/json"
-	"github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum"
 	"github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -32,7 +31,7 @@ func TestGetEventForSnapshot(t *testing.T) {
 
 	orderCreated := &OrderCreated{
 		UUID:     uuid.NewV4().String(),
-		Capacity: enum.ThreeGB,
+		Capacity: ThreeGB,
 	}
 
 	orderConfirmed := &OrderConfirmed{
@@ -77,7 +76,7 @@ func TestEventsWithAggregates(t *testing.T) {
 
 	orderCreated := &OrderCreated{
 		UUID:     uuid.NewV4().String(),
-		Capacity: enum.ThreeGB,
+		Capacity: ThreeGB,
 	}
 
 	RegisterEvent(orderCreated)
@@ -115,7 +114,7 @@ func TestEventsWithAggregates(t *testing.T) {
 
 	t.Log("tmpOrder: ", tmpOrder)
 
-	assert.True(t, tmpOrder.Capacity == enum.ThreeGB, "Capacity must be ThreeGB after event replay")
+	assert.True(t, tmpOrder.Capacity == ThreeGB, "Capacity must be ThreeGB after event replay")
 	assert.True(t, tmpOrder.ConfirmedBy == "me", "ConfirmedBy must be me after event replay")
 
 	//order.MarkAsCommited()
@@ -132,7 +131,7 @@ func TestSnapshots(t *testing.T) {
 	//event registry and apply the changes to the aggregate
 	orderCreated := &OrderCreated{
 		UUID:     uuid.NewV4().String(),
-		Capacity: enum.ThreeGB,
+		Capacity: ThreeGB,
 	}
 
 	RegisterEvent(orderCreated)

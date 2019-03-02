@@ -1,12 +1,9 @@
-module github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/event
+module github.com/innoxchain/ixstorage/pkg/apps/ixservice/event
 
-replace github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum v0.0.0 => ../enum
-
-replace github.com/innoxchain/ixstorage/config v0.0.0 => ../../../../../config
+replace github.com/innoxchain/ixstorage/config v0.0.0 => ../../../../config
 
 require (
 	github.com/innoxchain/ixstorage/config v0.0.0
-	github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum v0.0.0
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/kr/pty v1.1.3 // indirect
 	github.com/lib/pq v1.0.0
