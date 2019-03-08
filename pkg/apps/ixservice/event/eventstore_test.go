@@ -1,5 +1,6 @@
 package event
 
+/*
 import (
 	"encoding/json"
 	"github.com/satori/go.uuid"
@@ -203,3 +204,4 @@ func marshalToJSON(object interface{}) string {
 	}
 	return string(res)
 }
+*/

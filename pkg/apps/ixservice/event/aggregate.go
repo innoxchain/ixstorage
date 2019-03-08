@@ -11,6 +11,7 @@ import (
 
 type Aggregate interface {
 	GetAggregateID() string
+	GetVersion() int
 	trackChanges(e Event)
 	incrementVersion()
 	GetChanges() []Event
@@ -30,6 +31,10 @@ func (a *BaseAggregate) GetChanges() []Event {
 
 func (a *BaseAggregate) GetAggregateID() string {
 	return a.UUID
+}
+
+func (a *BaseAggregate) GetVersion() int {
+	return a.Version
 }
 
 func (a *BaseAggregate) incrementVersion() {

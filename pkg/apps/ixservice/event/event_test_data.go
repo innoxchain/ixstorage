@@ -146,6 +146,18 @@ func (coc ConfirmOrderCommand) CreateBaseEvent() BaseEvent {
 	}
 }
 
+type ReviseOrderCommand struct {
+	RevisedBy string
+	Reason string
+}
+
+func (roc ReviseOrderCommand) CreateBaseEvent() BaseEvent {
+	return OrderRevised{
+		RevisedBy: roc.RevisedBy,
+		Reason: roc.Reason,
+	}
+}
+
 //////////////////////////////////////////////////////////////////////
 // Order Enums														//
 //////////////////////////////////////////////////////////////////////

@@ -27,4 +27,4 @@ The eventstore demo uses CockroachDB as underlying database system. Follow the b
 
 ## Further reading
 
-A more detailed explanation of the ixservice eventsourcing approach can be found under ***TBD*** 
+A more detailed explanation of the ixservice eventsourcing approach can be found under [ixstorage Eventsourcing Quick Start Guide](../../../../../docs/eventsourcing/README.md)
