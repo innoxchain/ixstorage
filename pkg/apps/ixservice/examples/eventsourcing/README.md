@@ -24,6 +24,18 @@ The eventstore demo uses CockroachDB as underlying database system. Follow the b
 
 5. Run ```go run main.go``` and look at the log output which documents the steps in persisting initiated events.
 
+6. Check if the data is properly stored in the database by executing the following commands:
+
+    - ```docker exec -it roach1 ./cockroach sql --insecure```
+    
+    Once logged in to the database within the container execute:
+    
+    - ```use eventstore;```
+    
+    - ```select * from events;```
+
+    - ```select * from snapshots;```
+
 
 ## Further reading
 

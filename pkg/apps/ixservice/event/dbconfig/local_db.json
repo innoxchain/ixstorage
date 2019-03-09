@@ -1,5 +1,0 @@
-{
-    "ConnectString": "postgresql://test@localhost:26257",
-    "DatabaseName" : "eventstore",
-    "Sslmode" : "disable"
-}
