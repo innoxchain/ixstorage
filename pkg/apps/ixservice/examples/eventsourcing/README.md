@@ -1,6 +1,14 @@
 # Eventsourcing Demo
 
-The eventstore demo uses CockroachDB as underlying database system. Follow the below mentioned steps to run the demo with CockroachDB running in a docker container:
+The eventsourcing demo uses CockroachDB as underlying database system. For testing purposes CockroachDB can be installed on a local machine or started as a docker container.
+
+## Preconditions
+
+For the sake of simplicity we are using [docker]([docker](https://www.docker.com/get-started)) for this demo. Therefore  you should have the latest version of docker running on your local machine.
+
+## Run the demo
+
+Follow the below mentioned steps to run the demo with CockroachDB running in a docker container:
 
 1. Run steps 1 and 2 explained in [Start a local Cockroach Cluster](https://www.cockroachlabs.com/docs/stable/start-a-local-cluster-in-docker.html)
 
@@ -29,7 +37,7 @@ The eventstore demo uses CockroachDB as underlying database system. Follow the b
     - ```docker exec -it roach1 ./cockroach sql --insecure```
     
     Once logged in to the database within the container execute:
-    
+
     - ```use eventstore;```
     
     - ```select * from events;```
