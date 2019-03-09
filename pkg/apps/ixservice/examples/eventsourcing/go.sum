@@ -1,6 +1,8 @@
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/innoxchain/ixstorage/config v0.0.0-20190309213013-8f13bd56483b h1:GVmLCcB7eXdlanhKnnN7NvJkNHvMSV/1yJ8P6wj4QCw=
+github.com/innoxchain/ixstorage/config v0.0.0-20190309213013-8f13bd56483b/go.mod h1:oymoMnFy97NhJorKFkibhybYfkY04VPJMBtoq8IGPAQ=
 github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum v0.0.0-20190105211345-1314a4ed27e9 h1:JK/BFl5FK25fVF0VEhmB8ECBspm4z289W4e438Q4yo4=
 github.com/innoxchain/ixstorage/pkg/apps/ixservice/domain/enum v0.0.0-20190105211345-1314a4ed27e9/go.mod h1:BfsO9kbN8xHk26kvHfOJNVPZqkxK2ZBmIZPKuO7dkRo=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1 h1:mweAR1A6xJ3oS2pRaGiHgQ4OO8tzTaLawm8vnODuwDk=

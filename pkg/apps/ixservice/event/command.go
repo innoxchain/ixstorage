@@ -2,7 +2,6 @@ package event
 
 import (
 	log "github.com/sirupsen/logrus"
-	//store "github.com/innoxchain/ixstorage/pkg/apps/ixservice/eventstore"
 )
 
 type Command interface {
