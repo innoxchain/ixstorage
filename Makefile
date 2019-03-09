@@ -1,3 +1,8 @@
+ifndef $(GOPATH)
+    GOPATH=$(shell go env GOPATH)
+    export GOPATH
+endif
+
 GOBIN := $(GOPATH)/bin
 
 GOLINT_CMD := ${GOBIN}/golint
@@ -34,7 +39,7 @@ ifndef DEADCODE
 	@echo "Installing deadcode" && go get -u github.com/remyoudompheng/go-misc/deadcode
 endif
 
-verify: dependencies lint check_cyclo vet check_deadcode
+verify: dependencies lint check_cyclo check_deadcode
 
 .PHONY: lint
 lint: dependencies
@@ -50,8 +55,8 @@ check_cyclo: dependencies
 .PHONY: vet
 vet:
 	@echo "Running $@"
-	@go tool vet cmd
-	@go tool vet pkg
+	@go vet cmd
+	@go vet pkg
 
 .PHONY: check_deadcode
 check_deadcode: dependencies
