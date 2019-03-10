@@ -1,7 +1,6 @@
 module github.com/innoxchain/ixstorage/pkg/apps/ixservice/event
 
 require (
-	github.com/innoxchain/ixstorage/config v0.0.0-20190309213013-8f13bd56483b
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lib/pq v1.0.0
 	github.com/pkg/errors v0.8.1
